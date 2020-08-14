@@ -37,12 +37,12 @@ def funpricestock(bot, update, args):
 def funbitcoin(bot, update):
     buscabtc = BISCOINT
     jsonbtc = requests.get(buscabtc)
-        jsonbtc = jsonbtc.json()
-        pricebtc = jsonbtc['data']['last']
-        bot.send_message(
-            chat_id=update.message.chat_id,
-            text=f"O preço do Bitcoin é R$ {pricebtc}"
-        )
+    jsonbtc = jsonbtc.json()
+    pricebtc = jsonbtc['data']['last']
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text=f"O preço do Bitcoin é R$ {pricebtc}"
+    )
 
 def unknown(bot, update):
     bot.send_message(
