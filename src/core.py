@@ -4,6 +4,21 @@ from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 import requests
 import os
 from conf.settings import BASE_API_URL, TELEGRAM_TOKEN, BISCOINT, PHOEMUR 
+import logging
+import math
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+def corrigir_virgulas(price):
+    price = price.replace('.', ',')
+    #substitui ponto por vírcula
+    return price
+
 
 def start(bot, update):
     bot.send_message(
@@ -27,7 +42,7 @@ def funpricestock(bot, update, args):
         symbol = json['symbol']
         bot.send_message(
             chat_id=update.message.chat_id,
-            text=f"O preço da ação {symbol} é: {priceaction}, sendo a variação no dia de {changeaction}%")
+            text=f"O preço da ação {symbol} é: R$ {priceaction}, sendo a variação no dia de {changeaction}%")
     else:
         if(json.status_code==404):
             bot.send_message(
@@ -108,7 +123,41 @@ def fundamentus(bot, update, args):
         "\n"
         f"ROIC: {roic}%"
     )
-    
+
+def graham(bot, update, args):
+    ticker=args[0]
+    url="https://www.okanebox.com.br/api/analisefundamentalista/"
+    urlokane = url + ticker
+    json = requests.get(urlokane)
+    if(json.status_code==200):
+        json = json.json()
+        vpa = json[24]['value']
+        lpa = json[22]['value']
+        if (vpa>0):
+            if (lpa>0):
+                graham = round(math.sqrt(22.5 * lpa * vpa), 2)      
+                bot.send_message(
+                    chat_id=update.message.chat_id,
+                    text=f"O preço justo da ação {ticker} segundo a fórmula de Graham é: R$ {graham}")
+            else:
+                bot.send_message(
+                    chat_id=update.message.chat.id,
+                    text="LPA menor que zero, não é possível calcular!")
+        else:
+            bot.send_message(
+                chat_id=update.message.chat.id,
+                text="VPA menor que zero, não é possível calcular!")
+    else:
+        if(json.status_code==404):
+            bot.send_message(
+                chat_id=update.message.chat_id,
+                text=f"Código {args[0]} não encontrado, tem certeza que está correto?")
+        else:
+            bot.send_message(
+                chat_id=update.message.chat_id,
+                text="O servidor da formula de graham está indisponível no momento")
+
+        
 def unknown(bot, update):
     bot.send_message(
         chat_id=update.message.chat_id,
@@ -129,6 +178,9 @@ def main():
     )
     dispatcher.add_handler(
         CommandHandler('fundamentus', fundamentus, pass_args=True)
+    )
+    dispatcher.add_handler(
+        CommandHandler('graham', graham, pass_args=True)
     )
     dispatcher.add_handler(
         MessageHandler(Filters.command, unknown)
