@@ -8,10 +8,10 @@ import logging
 import math
 
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 def corrigir_virgulas(price):
@@ -43,6 +43,8 @@ def funpricestock(bot, update, args):
         bot.send_message(
             chat_id=update.message.chat_id,
             text=f"O preço da ação {symbol} é: R$ {priceaction}, sendo a variação no dia de {changeaction}%")
+        string_log = f"{symbol}, {priceaction}"
+        logging.info(string_log)
     else:
         if(json.status_code==404):
             bot.send_message(
@@ -56,12 +58,17 @@ def funpricestock(bot, update, args):
 def funbitcoin(bot, update):
     buscabtc = BISCOINT
     jsonbtc = requests.get(buscabtc)
-    jsonbtc = jsonbtc.json()
-    pricebtc = jsonbtc['data']['last']
-    bot.send_message(
-        chat_id=update.message.chat_id,
-        text=f"O preço do Bitcoin é R$ {pricebtc}"
-    )
+    if(jsonbtc.status_code==200):
+        jsonbtc = jsonbtc.json()
+        pricebtc = jsonbtc['data']['last']
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text=f"O preço do Bitcoin é R$ {pricebtc}")
+    else:
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Sistema temporariamente indisponível")
+        
 
 def fundamentus(bot, update, args):
     busca = PHOEMUR
@@ -126,27 +133,35 @@ def fundamentus(bot, update, args):
 
 def graham(bot, update, args):
     ticker=args[0]
-    url="https://www.okanebox.com.br/api/analisefundamentalista/"
-    urlokane = url + ticker
-    json = requests.get(urlokane)
+    url= "https://mfinance.com.br/api/v1/stocks/indicators/"
+    urlticker = url + ticker
+    json = requests.get(urlticker)
     if(json.status_code==200):
         json = json.json()
-        vpa = json[24]['value']
-        lpa = json[22]['value']
-        if (vpa>0):
+        vpa = json['bookValuePerShare']['value']
+        lpa = json['earningsPerShare']['value']
+        if (vpa>0 and vpa!=0):
             if (lpa>0):
                 graham = round(math.sqrt(22.5 * lpa * vpa), 2)      
                 bot.send_message(
                     chat_id=update.message.chat_id,
                     text=f"O preço justo da ação {ticker} segundo a fórmula de Graham é: R$ {graham}")
+                string_log = f"{ticker}, {vpa}, {lpa}"
+                logging.info(string_log)
             else:
                 bot.send_message(
                     chat_id=update.message.chat.id,
                     text="LPA menor que zero, não é possível calcular!")
         else:
-            bot.send_message(
-                chat_id=update.message.chat.id,
-                text="VPA menor que zero, não é possível calcular!")
+            if(vpa<0):
+                bot.send_message(
+                    chat_id=update.message.chat.id,
+                    text="VPA menor que zero, não é possível calcular!")
+            else:
+                if(vpa==0):
+                    bot.send_message(
+                        chat_id=update.message.chat.id,
+                        text="API mfinance está fora do ar")
     else:
         if(json.status_code==404):
             bot.send_message(
@@ -155,9 +170,9 @@ def graham(bot, update, args):
         else:
             bot.send_message(
                 chat_id=update.message.chat_id,
-                text="O servidor da formula de graham está indisponível no momento")
+                text="A API mfinance está indisponível no momento")
 
-        
+
 def unknown(bot, update):
     bot.send_message(
         chat_id=update.message.chat_id,
