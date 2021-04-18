@@ -161,16 +161,11 @@ def graham(bot, update, args):
                 if(vpa==0):
                     bot.send_message(
                         chat_id=update.message.chat.id,
-                        text="API mfinance está fora do ar")
+                        text="API mfinance está fora do ar ou o código digitado é inválido.")
     else:
-        if(json.status_code==404):
-            bot.send_message(
-                chat_id=update.message.chat_id,
-                text=f"Código {args[0]} não encontrado, tem certeza que está correto?")
-        else:
-            bot.send_message(
-                chat_id=update.message.chat_id,
-                text="A API mfinance está indisponível no momento")
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="A API mfinance está indisponível no momento por um motivo desconhecido.")
 
 
 def unknown(bot, update):
