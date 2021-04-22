@@ -3,7 +3,7 @@
 from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 import requests
 import os
-from conf.settings import BASE_API_URL, TELEGRAM_TOKEN, BISCOINT, PHOEMUR 
+from conf.settings import BASE_API_URL, TELEGRAM_TOKEN, BISCOINT, PHOEMUR
 import logging
 import math
 
@@ -14,9 +14,10 @@ logger.setLevel(logging.INFO)
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
+
 def corrigir_virgulas(price):
     price = price.replace('.', ',')
-    #substitui ponto por vírcula
+    # substitui ponto por vírcula
     return price
 
 
@@ -32,10 +33,11 @@ def start(bot, update):
         "/fundamentus + Código da ação (Responde com o valor da ação)"
     )
 
+
 def funpricestock(bot, update, args):
     busca = BASE_API_URL + args[0]
     json = requests.get(busca)
-    if(json.status_code==200):
+    if(json.status_code == 200):
         json = json.json()
         priceaction = json['lastPrice']
         changeaction = json['change']
@@ -46,7 +48,7 @@ def funpricestock(bot, update, args):
         string_log = f"{symbol}, {priceaction}"
         logging.info(string_log)
     else:
-        if(json.status_code==404):
+        if(json.status_code == 404):
             bot.send_message(
                 chat_id=update.message.chat_id,
                 text=f"Código {args[0]} não encontrado, tem certeza que está correto?")
@@ -55,10 +57,11 @@ def funpricestock(bot, update, args):
                 chat_id=update.message.chat_id,
                 text="O servidor das cotações está indisponível no momento")
 
+
 def funbitcoin(bot, update):
     buscabtc = BISCOINT
     jsonbtc = requests.get(buscabtc)
-    if(jsonbtc.status_code==200):
+    if(jsonbtc.status_code == 200):
         jsonbtc = jsonbtc.json()
         pricebtc = jsonbtc['data']['last']
         bot.send_message(
@@ -68,7 +71,16 @@ def funbitcoin(bot, update):
         bot.send_message(
             chat_id=update.message.chat_id,
             text="Sistema temporariamente indisponível")
-        
+
+
+def verificafundamentus(bot, update, args):
+    if len(args) == 0:
+        bot.send_message(
+            chat_id=update.message.chat.id,
+            text="Você precisa informar o ticket da ação")
+    else:
+        fundamentus(bot, update, args)
+
 
 def fundamentus(bot, update, args):
     busca = PHOEMUR
@@ -76,7 +88,8 @@ def fundamentus(bot, update, args):
     busca1 = requests.get(busca)
     busca1 = busca1.json()
     cotacao = busca1[ticker]['Cotacao']
-    DY = round(((busca1[ticker]['DY'])*100), 2) #função ROUND faz com que o numero só tenha 2 casas decimais
+    # função ROUND faz com que o numero só tenha 2 casas decimais
+    DY = round(((busca1[ticker]['DY'])*100), 2)
     div_brut_pat = round(((busca1[ticker]['Div.Brut/Pat.'])*100), 2)
     ev_ebit = busca1[ticker]['EV/EBIT']
     ev_ebitda = busca1[ticker]['EV/EBITDA']
@@ -131,37 +144,48 @@ def fundamentus(bot, update, args):
         f"ROIC: {roic}%"
     )
 
+
+def verificagraham(bot, update, args):
+    if len(args) == 0:
+        bot.send_message(
+            chat_id=update.message.chat.id,
+            text="Você precisa informar o ticket da ação")
+    else:
+        graham(bot, update, args)
+
+
 def graham(bot, update, args):
-    ticker=args[0]
-    url= "https://mfinance.com.br/api/v1/stocks/indicators/"
+    ticker = args[0]
+    url = "https://mfinance.com.br/api/v1/stocks/indicators/"
     urlticker = url + ticker
     json = requests.get(urlticker)
-    if(json.status_code==200):
+    if(json.status_code == 200):
         json = json.json()
         vpa = json['bookValuePerShare']['value']
         lpa = json['earningsPerShare']['value']
-        if (vpa>0 and vpa!=0):
-            if (lpa>0):
-                graham = round(math.sqrt(22.5 * lpa * vpa), 2)      
-                bot.send_message(
-                    chat_id=update.message.chat_id,
-                    text=f"O preço justo da ação {ticker} segundo a fórmula de Graham é: R$ {graham}")
-                string_log = f"{ticker}, {vpa}, {lpa}"
-                logging.info(string_log)
-            else:
-                bot.send_message(
-                    chat_id=update.message.chat.id,
-                    text="LPA menor que zero, não é possível calcular!")
+        if (vpa > 0 and lpa > 0):
+            graham = round(math.sqrt(22.5 * lpa * vpa), 2)
+            bot.send_message(
+                chat_id=update.message.chat_id,
+                text=f"O preço justo da ação {ticker} segundo a fórmula de Graham é: R$ {graham}")
+            string_log = f"{ticker}, {vpa}, {lpa}"
+            logging.info(string_log)
         else:
-            if(vpa<0):
+            if(vpa < 0):
                 bot.send_message(
                     chat_id=update.message.chat.id,
                     text="VPA menor que zero, não é possível calcular!")
-            else:
-                if(vpa==0):
-                    bot.send_message(
-                        chat_id=update.message.chat.id,
-                        text="API mfinance está fora do ar ou o código digitado é inválido.")
+
+            if(lpa < 0):
+                bot.send_message(
+                    chat_id=update.message.chat.id,
+                    text="LPA menor que zero, não é possível calcular!")
+
+            if(vpa == 0):
+                bot.send_message(
+                    chat_id=update.message.chat.id,
+                    text="API mfinance está fora do ar ou o código digitado é inválido.")
+
     else:
         bot.send_message(
             chat_id=update.message.chat_id,
@@ -173,6 +197,7 @@ def unknown(bot, update):
         chat_id=update.message.chat_id,
         text="Não Entendi"
     )
+
 
 def main():
     updater = Updater(token=TELEGRAM_TOKEN)
@@ -187,10 +212,10 @@ def main():
         CommandHandler('bitcoin', funbitcoin, pass_args=False)
     )
     dispatcher.add_handler(
-        CommandHandler('fundamentus', fundamentus, pass_args=True)
+        CommandHandler('fundamentus', verificafundamentus, pass_args=True)
     )
     dispatcher.add_handler(
-        CommandHandler('graham', graham, pass_args=True)
+        CommandHandler('graham', verificagraham, pass_args=True)
     )
     dispatcher.add_handler(
         MessageHandler(Filters.command, unknown)
@@ -198,6 +223,7 @@ def main():
     updater.start_polling()
 
     updater.idle()
+
 
 if __name__ == '__main__':
     print("press CTRL + C to cancel.")
