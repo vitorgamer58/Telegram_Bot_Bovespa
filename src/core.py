@@ -15,11 +15,6 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
-def corrigir_virgulas(price):
-    price = price.replace('.', ',')
-    # substitui ponto por vírcula
-    return price
-
 
 def start(bot, update):
     bot.send_message(
@@ -31,20 +26,24 @@ def start(bot, update):
         "/bitcoin (responde com a cotação do bitcoin na biscoint)"
         "\n"
         "/fundamentus + Código da ação (Responde com o valor da ação)"
+        "\n"
+        "/graham + Código da ação (Responde com o preço justo segundo a fórmula de Graham)"
     )
 
 
 def funpricestock(bot, update, args):
-    busca = BASE_API_URL + args[0]
+    ticker = args[0].upper()
+    busca = BASE_API_URL + "stocks/" + ticker
     json = requests.get(busca)
     if(json.status_code == 200):
         json = json.json()
         priceaction = json['lastPrice']
         changeaction = json['change']
         symbol = json['symbol']
+        priceaction = (priceaction)
         bot.send_message(
             chat_id=update.message.chat_id,
-            text=f"O preço da ação {symbol} é: R$ {priceaction}, sendo a variação no dia de {changeaction}%")
+            text=f"O preço da ação {symbol} é: R$ {priceaction} sendo a variação no dia de {changeaction}%")
         string_log = f"{symbol}, {priceaction}"
         logging.info(string_log)
     else:
@@ -84,7 +83,7 @@ def verificafundamentus(bot, update, args):
 
 def fundamentus(bot, update, args):
     busca = PHOEMUR
-    ticker = args[0]
+    ticker = args[0].upper()
     busca1 = requests.get(busca)
     busca1 = busca1.json()
     cotacao = busca1[ticker]['Cotacao']
@@ -155,9 +154,8 @@ def verificagraham(bot, update, args):
 
 
 def graham(bot, update, args):
-    ticker = args[0]
-    url = "https://mfinance.com.br/api/v1/stocks/indicators/"
-    urlticker = url + ticker
+    ticker = args[0].upper()
+    urlticker = BASE_API_URL + "stocks/indicators/" + ticker
     json = requests.get(urlticker)
     if(json.status_code == 200):
         json = json.json()

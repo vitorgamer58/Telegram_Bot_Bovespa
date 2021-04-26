@@ -20,6 +20,7 @@ A função principal do Bot é retornar a cotação de alguma ação listada na 
 | /price + código da ação | retorna a cotação e a variação no dia |
 | /bitcoin	| retorna a cotação do bitcoin |
 | /fundamentus + código da ação | retorna indicadores fundamentalistas
+| /graham + código da ação | retorna o valor justo de acordo com a fórmula de Graham
 
 ## Devidos créditos e direitos autorais de terceiros
 O código base para a criação deste bot se deu por um tutorial postado no medium.com de autoria do Mauro de Carvalho, que pode ser encontrado aqui: [https://medium.com/](https://medium.com/@mdcg.dev/desenvolvendo-o-seu-primeiro-chatbot-no-telegram-com-python-a9ad787bdf6)
@@ -27,6 +28,8 @@ O código base para a criação deste bot se deu por um tutorial postado no medi
 O código base encontra-se aqui: [/commit/a64fe47fb1b5f101ea68736c3099d9b7f9a08b67](https://github.com/vitorgamer58/Telegram_Bot_Bovespa/commit/a64fe47fb1b5f101ea68736c3099d9b7f9a08b67)
 
 Para o preço do bitcoin usa-se a api da [Biscoint](https://biscoint.io/)
+
+Alguns indicadores e o preço da ação derivam da API [mfinance](https://mfinance.com.br/swagger/index.html)
 
 ### Fundamentus
 Utiliza-se o código [phoemur](https://github.com/phoemur/fundamentus) que puxa os dados do site [Fundamentus](https://fundamentus.com.br/) 
