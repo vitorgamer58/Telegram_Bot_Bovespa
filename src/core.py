@@ -35,18 +35,27 @@ def funpricestock(bot, update, args):
     ticker = args[0].upper()
     busca = BASE_API_URL + "stocks/" + ticker
     json = requests.get(busca)
+
     if(json.status_code == 200):
         json = json.json()
         priceaction = json['lastPrice']
         changeaction = json['change']
         symbol = json['symbol']
-        priceaction = (priceaction)
-        bot.send_message(
-            chat_id=update.message.chat_id,
-            text=f"O preço da ação {symbol} é: R$ {priceaction} sendo a variação no dia de {changeaction}%")
-        string_log = f"{symbol}, {priceaction}"
+
+        if priceaction == 0:
+            bot.send_message(
+                chat_id=update.message.chat_id,
+                text=f"Código {ticker} não encontrado, tem certeza que está correto?")
+        else:
+            bot.send_message(
+                chat_id=update.message.chat_id,
+                text=f"O preço da ação {symbol} é: R$ {priceaction} sendo a variação no dia de {changeaction}%")
+
+        string_log = f"{ticker}, {priceaction}"
         logging.info(string_log)
+
     else:
+
         if(json.status_code == 404):
             bot.send_message(
                 chat_id=update.message.chat_id,
@@ -152,37 +161,60 @@ def verificagraham(bot, update, args):
     else:
         graham(bot, update, args)
 
+def grahamprice(ticker):
+    busca = BASE_API_URL + "stocks/" + ticker
+    json = requests.get(busca)
+    json = json.json()
+    price = json['lastPrice']
+    return price
+
 
 def graham(bot, update, args):
     ticker = args[0].upper()
-    urlticker = BASE_API_URL + "stocks/indicators/" + ticker
-    json = requests.get(urlticker)
+    graham_url = BASE_API_URL + "stocks/indicators/" + ticker
+    json = requests.get(graham_url)
     if(json.status_code == 200):
         json = json.json()
         vpa = json['bookValuePerShare']['value']
         lpa = json['earningsPerShare']['value']
         if (vpa > 0 and lpa > 0):
             graham = round(math.sqrt(22.5 * lpa * vpa), 2)
+            price = grahamprice(ticker)
+            desconto_agio = round(((price/graham)-1)*100, 2)
+
+            if(desconto_agio <= 0):
+                resultado = 'desconto'
+            else:
+                resultado = 'ágio'
+
             bot.send_message(
                 chat_id=update.message.chat_id,
-                text=f"O preço justo da ação {ticker} segundo a fórmula de Graham é: R$ {graham}")
+                text=f"O preço justo da ação {ticker} segundo a fórmula de Graham é: R$ {graham}"
+                "\n"
+                f"Com um {resultado} de {abs(desconto_agio)}%"
+                "\n"
+                f"Preço: {price}  VPA: {vpa}  LPA: {lpa}")
             string_log = f"{ticker}, {vpa}, {lpa}"
             logging.info(string_log)
         else:
             if(vpa < 0):
                 bot.send_message(
                     chat_id=update.message.chat.id,
-                    text="VPA menor que zero, não é possível calcular!")
+                    text="VPA menor que zero, não é possível calcular!"
+                    "\n"
+                    f"VPA: {vpa}  LPA: {lpa}")
 
             if(lpa < 0):
                 bot.send_message(
                     chat_id=update.message.chat.id,
-                    text="LPA menor que zero, não é possível calcular!")
+                    text="LPA menor que zero, não é possível calcular!"                    
+                    "\n"
+                    f"VPA: {vpa}  LPA: {lpa}")
 
             if(vpa == 0):
                 bot.send_message(
                     chat_id=update.message.chat.id,
-                    text="API mfinance está fora do ar ou o código digitado é inválido.")
+                    text=f"API mfinance está fora do ar ou o código {ticker} é inválido.")
 
     else:
         bot.send_message(
