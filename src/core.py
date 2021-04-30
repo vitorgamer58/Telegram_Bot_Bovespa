@@ -30,6 +30,14 @@ def start(bot, update):
         "/graham + Código da ação (Responde com o preço justo segundo a fórmula de Graham)"
     )
 
+def verificaprice(bot, update, args):
+    #Verifica se o usuário passou o ticker da ação como argumento.
+    if len(args) == 0:
+        bot.send_message(
+            chat_id=update.message.chat.id,
+            text="Você precisa informar o ticket da ação")
+    else:
+        funpricestock(bot, update, args)
 
 def funpricestock(bot, update, args):
     ticker = args[0].upper()
@@ -236,7 +244,7 @@ def main():
         CommandHandler('start', start)
     )
     dispatcher.add_handler(
-        CommandHandler('price', funpricestock, pass_args=True)
+        CommandHandler('price', verificaprice, pass_args=True)
     )
     dispatcher.add_handler(
         CommandHandler('bitcoin', funbitcoin, pass_args=False)
