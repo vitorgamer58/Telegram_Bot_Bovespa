@@ -21,6 +21,7 @@ A função principal do Bot é retornar a cotação de alguma ação listada na 
 | /bitcoin	| retorna a cotação do bitcoin |
 | /fundamentus + código da ação | retorna indicadores fundamentalistas
 | /graham + código da ação | retorna o valor justo de acordo com a fórmula de Graham
+| /fechamento | retorna as maiores altas e baixas do ibovespa
 
 ## Devidos créditos e direitos autorais de terceiros
 O código base para a criação deste bot se deu por um tutorial postado no medium.com de autoria do Mauro de Carvalho, que pode ser encontrado aqui: [https://medium.com/](https://medium.com/@mdcg.dev/desenvolvendo-o-seu-primeiro-chatbot-no-telegram-com-python-a9ad787bdf6)
