@@ -74,6 +74,22 @@ def fechamento(bot, update):
     data_atual = date.today()
     data_em_texto = data_atual.strftime('%d/%m/%Y')
 
+    #obtem as mais negociadas
+    data_stocks.sort(key=operator.itemgetter('volume')) #organiza pelo volume
+    quantidade_dados = len(data_stocks)
+    quantidade_dados -= 1
+
+    mais_negociadas = [data_stocks[quantidade_dados]['symbol'],
+                        data_stocks[quantidade_dados]['change']]
+
+    x = 5
+    while x >= 1:
+        x -= 1
+        quantidade_dados -= 1
+        mais_negociadas.append(data_stocks[quantidade_dados]['symbol'])
+        mais_negociadas.append(data_stocks[quantidade_dados]['change'])
+        # adiciona mais 4 empresas na lista de mais negociadas
+
     bot.send_message(
         chat_id=update.message.chat_id,
         text='Confira os dados de fechamento do pregão!🦈'
@@ -108,7 +124,20 @@ def fechamento(bot, update):
         "\n"
         f'4️⃣ {maior_baixa[6]} {maior_baixa[7]}%'
         "\n"
-        f'5️⃣ {maior_baixa[8]} {maior_baixa[9]}%')
+        f'5️⃣ {maior_baixa[8]} {maior_baixa[9]}%'
+        "\n"
+        "\n"
+        '💥MAIS NEGOCIADAS DO PREGÃO'
+        "\n"
+        f'1️⃣ {mais_negociadas[0]} {mais_negociadas[1]}%'
+        "\n"
+        f'2️⃣ {mais_negociadas[2]} {mais_negociadas[3]}%'
+        "\n"
+        f'3️⃣ {mais_negociadas[4]} {mais_negociadas[5]}%'
+        "\n"
+        f'4️⃣ {mais_negociadas[6]} {mais_negociadas[7]}%'
+        "\n"
+        f'5️⃣ {mais_negociadas[8]} {mais_negociadas[9]}%')
 
     #Imprime no log
     string_log = "/Comando fechamento Acionado"
@@ -189,6 +218,8 @@ def funbitcoin(bot, update):
         bot.send_message(
             chat_id=update.message.chat_id,
             text="Sistema temporariamente indisponível")
+    string_log = "Comando /Bitcoin Acionado"
+    logging.info(string_log)
 
 
 def fundamentus(bot, update, args):
@@ -312,7 +343,8 @@ def graham(bot, update, args):
             elif(lpa < 0):
                 bot.send_message(
                     chat_id=update.message.chat.id,
-                    text="LPA menor que zero, não é possível calcular!"                    "\n"
+                    text="LPA menor que zero, não é possível calcular!"                    
+                    "\n"
                     f"VPA: {vpa}  LPA: {lpa}")
 
             elif(vpa == 0):
