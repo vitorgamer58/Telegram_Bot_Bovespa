@@ -7,6 +7,15 @@ from conf.settings import BASE_API_URL, TELEGRAM_TOKEN, BISCOINT, PHOEMUR
 import logging
 import math
 
+#from pandas_datareader import data as wb
+#import matplotlib.pyplot as plt
+#import datetime
+
+import operator
+import csv
+
+from datetime import date
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
@@ -15,6 +24,124 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
+def fechamento(bot, update):
+    with open('./bovespa_indice2.csv', newline='') as f:
+        reader = csv.reader(f)
+        list_ibov = list(reader)
+        # obtem uma lista de ações do indice IBOVESPA
+
+    # Puxa os dados de todas as empresas listadas
+    data_stocks = requests.get('https://mfinance.com.br/api/v1/stocks')
+    data_stocks = data_stocks.json()
+
+    # obter variação do indice Ibovespa
+    ibov = data_stocks['stocks'][0]['change']
+
+    # organiza pela alteração no dia - itemgetter('change')
+    data_stocks['stocks'].sort(key=operator.itemgetter('change'))
+
+    # Filtra as ações listadas, excluindo todas que não fazem parte do indice Ibovespa
+    data_stocks = [i for i in data_stocks['stocks']
+                   if (i['symbol'] in list_ibov[0])]
+    quantidade_dados = len(data_stocks)  # conta a quantidade de dicts na lista
+
+    # obter maiores altas
+    quantidade_dados -= 1
+    maior_alta = [data_stocks[quantidade_dados]['symbol'],
+                  data_stocks[quantidade_dados]['change']]
+
+    x = 5
+    while x >= 1:
+        x -= 1
+        quantidade_dados -= 1
+        maior_alta.append(data_stocks[quantidade_dados]['symbol'])
+        maior_alta.append(data_stocks[quantidade_dados]['change'])
+        # adiciona mais 4 empresas na lista de maiores altas
+
+    # obter maiores baixas
+    quantidade_dados = 0
+    maior_baixa = [data_stocks[quantidade_dados]['symbol'],
+                   data_stocks[quantidade_dados]['change']]
+
+    y = 0
+    while y <= 3:
+        y += 1
+        quantidade_dados += 1
+        maior_baixa.append(data_stocks[quantidade_dados]['symbol'])
+        maior_baixa.append(data_stocks[quantidade_dados]['change'])
+
+    # obtem o dia de hoje
+    data_atual = date.today()
+    data_em_texto = data_atual.strftime('%d/%m/%Y')
+
+    #obtem as mais negociadas
+    data_stocks.sort(key=operator.itemgetter('volume')) #organiza pelo volume
+    quantidade_dados = len(data_stocks)
+    quantidade_dados -= 1
+
+    mais_negociadas = [data_stocks[quantidade_dados]['symbol'],
+                        data_stocks[quantidade_dados]['change']]
+
+    x = 5
+    while x >= 1:
+        x -= 1
+        quantidade_dados -= 1
+        mais_negociadas.append(data_stocks[quantidade_dados]['symbol'])
+        mais_negociadas.append(data_stocks[quantidade_dados]['change'])
+        # adiciona mais 4 empresas na lista de mais negociadas
+
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text='Confira os dados de fechamento do pregão!🦈'
+        "\n"
+        "\n"
+        f' {data_em_texto}'
+        "\n"
+        "\n"
+        f' 🇧🇷 IBOVESPA : {ibov}%'
+        "\n"
+        "\n"
+        '📈 MAIORES ALTAS DO IBOV'
+        "\n"
+        f'1️⃣ {maior_alta[0]} {maior_alta[1]}%'
+        "\n"
+        f'2️⃣ {maior_alta[2]} {maior_alta[3]}%'
+        "\n"
+        f'3️⃣ {maior_alta[4]} {maior_alta[5]}%'
+        "\n"
+        f'4️⃣ {maior_alta[6]} {maior_alta[7]}%'
+        "\n"
+        f'5️⃣ {maior_alta[8]} {maior_alta[9]}%'
+        "\n"
+        "\n"
+        '📉MAIORES BAIXAS DO IBOV'
+        "\n"
+        f'1️⃣ {maior_baixa[0]} {maior_baixa[1]}%'
+        "\n"
+        f'2️⃣ {maior_baixa[2]} {maior_baixa[3]}%'
+        "\n"
+        f'3️⃣ {maior_baixa[4]} {maior_baixa[5]}%'
+        "\n"
+        f'4️⃣ {maior_baixa[6]} {maior_baixa[7]}%'
+        "\n"
+        f'5️⃣ {maior_baixa[8]} {maior_baixa[9]}%'
+        "\n"
+        "\n"
+        '💥MAIS NEGOCIADAS DO PREGÃO'
+        "\n"
+        f'1️⃣ {mais_negociadas[0]} {mais_negociadas[1]}%'
+        "\n"
+        f'2️⃣ {mais_negociadas[2]} {mais_negociadas[3]}%'
+        "\n"
+        f'3️⃣ {mais_negociadas[4]} {mais_negociadas[5]}%'
+        "\n"
+        f'4️⃣ {mais_negociadas[6]} {mais_negociadas[7]}%'
+        "\n"
+        f'5️⃣ {mais_negociadas[8]} {mais_negociadas[9]}%')
+
+    #Imprime no log
+    string_log = "/Comando fechamento Acionado"
+    logging.info(string_log)
 
 def start(bot, update):
     bot.send_message(
@@ -23,23 +150,27 @@ def start(bot, update):
         "\n"
         "/price + Código da ação (Responde com o valor da ação)"
         "\n"
-        "/bitcoin (responde com a cotação do bitcoin na biscoint)"
+        "/bitcoin (Responde com a cotação do bitcoin na biscoint)"
         "\n"
         "/fundamentus + Código da ação (Responde com o valor da ação)"
         "\n"
         "/graham + Código da ação (Responde com o preço justo segundo a fórmula de Graham)"
+        "\n"
+        "/fechamento (responde com as maiores altas e maiores baixas do ibov"
     )
 
-def verificaprice(bot, update, args):
-    #Verifica se o usuário passou o ticker da ação como argumento.
+
+def funpricestock(bot, update, args):
     if len(args) == 0:
+        '''
+        Esse IF verifica se o usuário não passou como argumento do comando
+        Em caso positivo, envia a mensagem e dá um return para finalizar a função funpricestock
+        '''
         bot.send_message(
             chat_id=update.message.chat.id,
             text="Você precisa informar o ticket da ação")
-    else:
-        funpricestock(bot, update, args)
+        return
 
-def funpricestock(bot, update, args):
     ticker = args[0].upper()
     busca = BASE_API_URL + "stocks/" + ticker
     json = requests.get(busca)
@@ -59,7 +190,7 @@ def funpricestock(bot, update, args):
                 chat_id=update.message.chat_id,
                 text=f"O preço da ação {symbol} é: R$ {priceaction} sendo a variação no dia de {changeaction}%")
 
-        string_log = f"{ticker}, {priceaction}"
+        string_log = f"Comando /price acionado - {symbol}, {priceaction}"
         logging.info(string_log)
 
     else:
@@ -87,18 +218,17 @@ def funbitcoin(bot, update):
         bot.send_message(
             chat_id=update.message.chat_id,
             text="Sistema temporariamente indisponível")
+    string_log = "Comando /Bitcoin Acionado"
+    logging.info(string_log)
 
 
-def verificafundamentus(bot, update, args):
+def fundamentus(bot, update, args):
     if len(args) == 0:
         bot.send_message(
             chat_id=update.message.chat.id,
             text="Você precisa informar o ticket da ação")
-    else:
-        fundamentus(bot, update, args)
+        return
 
-
-def fundamentus(bot, update, args):
     busca = PHOEMUR
     ticker = args[0].upper()
     busca1 = requests.get(busca)
@@ -161,14 +291,6 @@ def fundamentus(bot, update, args):
     )
 
 
-def verificagraham(bot, update, args):
-    if len(args) == 0:
-        bot.send_message(
-            chat_id=update.message.chat.id,
-            text="Você precisa informar o ticket da ação")
-    else:
-        graham(bot, update, args)
-
 def grahamprice(ticker):
     busca = BASE_API_URL + "stocks/" + ticker
     json = requests.get(busca)
@@ -178,6 +300,12 @@ def grahamprice(ticker):
 
 
 def graham(bot, update, args):
+    if len(args) == 0:
+        bot.send_message(
+            chat_id=update.message.chat.id,
+            text="Você precisa informar o ticket da ação")
+        return
+
     ticker = args[0].upper()
     graham_url = BASE_API_URL + "stocks/indicators/" + ticker
     json = requests.get(graham_url)
@@ -212,14 +340,14 @@ def graham(bot, update, args):
                     "\n"
                     f"VPA: {vpa}  LPA: {lpa}")
 
-            if(lpa < 0):
+            elif(lpa < 0):
                 bot.send_message(
                     chat_id=update.message.chat.id,
                     text="LPA menor que zero, não é possível calcular!"                    
                     "\n"
                     f"VPA: {vpa}  LPA: {lpa}")
 
-            if(vpa == 0):
+            elif(vpa == 0):
                 bot.send_message(
                     chat_id=update.message.chat.id,
                     text=f"API mfinance está fora do ar ou o código {ticker} é inválido.")
@@ -230,6 +358,25 @@ def graham(bot, update, args):
             text="A API mfinance está indisponível no momento por um motivo desconhecido.")
 
 
+'''
+def grafico(bot, update, args):
+    ticker = args[0].upper()
+    ticker = ticker + '.SA'
+    start = datetime.datetime(2018, 1, 1)
+    end = datetime.datetime(2021, 5, 1)
+    data = wb.DataReader(ticker, data_source='yahoo', start=start, end=end)
+    print(data.tail())
+    data['Close'].plot(figsize=(8, 5))
+    plt.savefig('./graph.png')
+    bot.send_photo(
+        chat_id=update.message.chat_id,
+        photo=open('./graph.png', 'rb')
+    )
+    if os.path.exists('./graph.png'):
+        os.remove('./graph.png')
+'''
+
+
 def unknown(bot, update):
     bot.send_message(
         chat_id=update.message.chat_id,
@@ -238,22 +385,28 @@ def unknown(bot, update):
 
 
 def main():
-    updater = Updater(token=TELEGRAM_TOKEN)
+    updater = Updater(token=TELEGRAM_TOKEN, use_context=False)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(
         CommandHandler('start', start)
     )
     dispatcher.add_handler(
-        CommandHandler('price', verificaprice, pass_args=True)
+        CommandHandler('price', funpricestock, pass_args=True)
     )
     dispatcher.add_handler(
         CommandHandler('bitcoin', funbitcoin, pass_args=False)
     )
     dispatcher.add_handler(
-        CommandHandler('fundamentus', verificafundamentus, pass_args=True)
+        CommandHandler('fundamentus', fundamentus, pass_args=True)
     )
     dispatcher.add_handler(
-        CommandHandler('graham', verificagraham, pass_args=True)
+        CommandHandler('graham', graham, pass_args=True)
+    )
+    '''dispatcher.add_handler(
+        CommandHandler('grafico', grafico, pass_args=True)
+    )'''
+    dispatcher.add_handler(
+        CommandHandler('fechamento', fechamento, pass_args=False)
     )
     dispatcher.add_handler(
         MessageHandler(Filters.command, unknown)
