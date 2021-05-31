@@ -24,7 +24,7 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
-def fechamento(bot, update):
+def fechamento(update, context):
     with open('./bovespa_indice2.csv', newline='') as f:
         reader = csv.reader(f)
         list_ibov = list(reader)
@@ -90,7 +90,7 @@ def fechamento(bot, update):
         mais_negociadas.append(data_stocks[quantidade_dados]['change'])
         # adiciona mais 4 empresas na lista de mais negociadas
 
-    bot.send_message(
+    context.bot.send_message(
         chat_id=update.message.chat_id,
         text='Confira os dados de fechamento do pregão!🦈'
         "\n"
@@ -143,8 +143,8 @@ def fechamento(bot, update):
     string_log = "/Comando fechamento Acionado"
     logging.info(string_log)
 
-def start(bot, update):
-    bot.send_message(
+def start(update, context):
+    context.bot.send_message(
         chat_id=update.message.chat_id,
         text="Olá, eu sou um robô, meus comandos são:"
         "\n"
@@ -160,18 +160,18 @@ def start(bot, update):
     )
 
 
-def funpricestock(bot, update, args):
-    if len(args) == 0:
+def funpricestock(update, context):
+    if len(context.args) == 0:
         '''
         Esse IF verifica se o usuário não passou como argumento do comando
         Em caso positivo, envia a mensagem e dá um return para finalizar a função funpricestock
         '''
-        bot.send_message(
+        context.bot.send_message(
             chat_id=update.message.chat.id,
             text="Você precisa informar o ticket da ação")
         return
 
-    ticker = args[0].upper()
+    ticker = context.args[0].upper()
     busca = BASE_API_URL + "stocks/" + ticker
     json = requests.get(busca)
 
@@ -182,11 +182,11 @@ def funpricestock(bot, update, args):
         symbol = json['symbol']
 
         if priceaction == 0:
-            bot.send_message(
+            context.bot.send_message(
                 chat_id=update.message.chat_id,
                 text=f"Código {ticker} não encontrado, tem certeza que está correto?")
         else:
-            bot.send_message(
+            context.bot.send_message(
                 chat_id=update.message.chat_id,
                 text=f"O preço da ação {symbol} é: R$ {priceaction} sendo a variação no dia de {changeaction}%")
 
@@ -196,41 +196,41 @@ def funpricestock(bot, update, args):
     else:
 
         if(json.status_code == 404):
-            bot.send_message(
+            context.bot.send_message(
                 chat_id=update.message.chat_id,
-                text=f"Código {args[0]} não encontrado, tem certeza que está correto?")
+                text=f"Código {context.args[0]} não encontrado, tem certeza que está correto?")
         else:
-            bot.send_message(
+            context.bot.send_message(
                 chat_id=update.message.chat_id,
                 text="O servidor das cotações está indisponível no momento")
 
 
-def funbitcoin(bot, update):
+def funbitcoin(update, context):
     buscabtc = BISCOINT
     jsonbtc = requests.get(buscabtc)
     if(jsonbtc.status_code == 200):
         jsonbtc = jsonbtc.json()
         pricebtc = jsonbtc['data']['last']
-        bot.send_message(
+        context.bot.send_message(
             chat_id=update.message.chat_id,
             text=f"O preço do Bitcoin é R$ {pricebtc}")
     else:
-        bot.send_message(
+        context.bot.send_message(
             chat_id=update.message.chat_id,
             text="Sistema temporariamente indisponível")
     string_log = "Comando /Bitcoin Acionado"
     logging.info(string_log)
 
 
-def fundamentus(bot, update, args):
-    if len(args) == 0:
-        bot.send_message(
+def fundamentus(update, context):
+    if len(context.args) == 0:
+        context.bot.send_message(
             chat_id=update.message.chat.id,
             text="Você precisa informar o ticket da ação")
         return
 
     busca = PHOEMUR
-    ticker = args[0].upper()
+    ticker = context.args[0].upper()
     busca1 = requests.get(busca)
     busca1 = busca1.json()
     cotacao = busca1[ticker]['Cotacao']
@@ -251,7 +251,7 @@ def fundamentus(bot, update, args):
     psr = busca1[ticker]['PSR']
     roe = round(((busca1[ticker]['ROE'])*100), 2)
     roic = round(((busca1[ticker]['ROIC'])*100), 2)
-    bot.send_message(
+    context.bot.send_message(
         chat_id=update.message.chat_id,
         text=f"FUNDAMENTUS {ticker}"
         "\n"
@@ -299,14 +299,14 @@ def grahamprice(ticker):
     return price
 
 
-def graham(bot, update, args):
-    if len(args) == 0:
-        bot.send_message(
+def graham(update, context):
+    if len(context.args) == 0:
+        context.bot.send_message(
             chat_id=update.message.chat.id,
             text="Você precisa informar o ticket da ação")
         return
 
-    ticker = args[0].upper()
+    ticker = context.args[0].upper()
     graham_url = BASE_API_URL + "stocks/indicators/" + ticker
     json = requests.get(graham_url)
     if(json.status_code == 200):
@@ -323,7 +323,7 @@ def graham(bot, update, args):
             else:
                 resultado = 'ágio'
 
-            bot.send_message(
+            context.bot.send_message(
                 chat_id=update.message.chat_id,
                 text=f"O preço justo da ação {ticker} segundo a fórmula de Graham é: R$ {graham}"
                 "\n"
@@ -334,26 +334,26 @@ def graham(bot, update, args):
             logging.info(string_log)
         else:
             if(vpa < 0):
-                bot.send_message(
+                context.bot.send_message(
                     chat_id=update.message.chat.id,
                     text="VPA menor que zero, não é possível calcular!"
                     "\n"
                     f"VPA: {vpa}  LPA: {lpa}")
 
             elif(lpa < 0):
-                bot.send_message(
+                context.bot.send_message(
                     chat_id=update.message.chat.id,
                     text="LPA menor que zero, não é possível calcular!"                    
                     "\n"
                     f"VPA: {vpa}  LPA: {lpa}")
 
             elif(vpa == 0):
-                bot.send_message(
+                context.bot.send_message(
                     chat_id=update.message.chat.id,
                     text=f"API mfinance está fora do ar ou o código {ticker} é inválido.")
 
     else:
-        bot.send_message(
+        context.bot.send_message(
             chat_id=update.message.chat_id,
             text="A API mfinance está indisponível no momento por um motivo desconhecido.")
 
@@ -377,15 +377,15 @@ def grafico(bot, update, args):
 '''
 
 
-def unknown(bot, update):
-    bot.send_message(
+def unknown(update, context):
+    context.bot.send_message(
         chat_id=update.message.chat_id,
         text="Não Entendi"
     )
 
 
 def main():
-    updater = Updater(token=TELEGRAM_TOKEN, use_context=False)
+    updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(
         CommandHandler('start', start)
