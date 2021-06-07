@@ -4,3 +4,7 @@ src/conf/__pycache__/
 .vs/Telegram_Bot_Bovespa/v16/.suo
 .vs/VSWorkspaceState.json
 .vscode/launch.json
+.idea
+src/__pycache__/
+tests/__init__.py
+src/fechamento.py
