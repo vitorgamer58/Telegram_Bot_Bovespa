@@ -5,6 +5,7 @@ from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 from conf.settings import TELEGRAM_TOKEN
 import logging
 from funcoes import *
+from analyse import *
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -14,11 +15,12 @@ logging.basicConfig(level=logging.INFO,
 
 
 def fechamento(update, context):
-    call_function = get_fechamento()
+    call_function = get_fechamento(update.message.from_user['username'])
     context.bot.send_message(
         chat_id = update.message.chat_id,
         text = call_function['message']
     )
+    send_menssage('/fechamento', 'user', '', update.message.from_user['username'])
 
 def start(update, context):
     context.bot.send_message(
@@ -38,7 +40,7 @@ def start(update, context):
 
 
 def price(update, context):
-    call_function = get_price(context.args)
+    call_function = get_price(context.args, update.message.from_user['username'])
     context.bot.send_message(
         chat_id = update.message.chat_id,
         text = call_function['message']
@@ -46,7 +48,7 @@ def price(update, context):
 
 
 def bitcoin(update, context):
-    call_function = get_bitcoin()
+    call_function = get_bitcoin(update.message.from_user['username'])
     context.bot.send_message(
         chat_id = update.message.chat_id,
         text = call_function['message']
@@ -54,7 +56,7 @@ def bitcoin(update, context):
 
 
 def fundamentus(update, context):
-    call_function = get_fundamentus(context.args)
+    call_function = get_fundamentus(context.args, update.message.from_user['username'])
     context.bot.send_message(
         chat_id = update.message.chat_id,
         text = call_function['message']
@@ -63,7 +65,7 @@ def fundamentus(update, context):
 
 
 def graham(update, context):
-    call_function = get_graham(context.args)
+    call_function = get_graham(context.args, update.message.from_user['username'])
     context.bot.send_message(
         chat_id = update.message.chat_id,
         text = call_function['message']

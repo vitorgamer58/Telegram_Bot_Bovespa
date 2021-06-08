@@ -1,6 +1,7 @@
 # coding: utf-8
 # vitorgamer58
 
+from src.analyse import not_handled, send_menssage
 import requests
 import logging
 import math
@@ -14,6 +15,8 @@ import csv
 
 from datetime import date
 
+from analyse import *
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
@@ -22,7 +25,7 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
-def get_fechamento():
+def get_fechamento(username):
     with open('../bovespa_indice2.csv', newline='') as f:
         reader = csv.reader(f)
         list_ibov = list(reader)
@@ -135,17 +138,23 @@ def get_fechamento():
                          "\n"
                          f'5️⃣ {mais_negociadas[8]} {mais_negociadas[9]}%')
     
-    var_return = {'status': 'OK',
-                    'message': string_de_retorno}
-    return var_return
+    send_menssage('/fechamento', 'agent', string_de_retorno, username)
 
     # Imprime no log
     string_log = "/Comando fechamento Acionado"
     logging.info(string_log)
 
+    var_return = {'status': 'OK',
+                    'message': string_de_retorno}
+    
+    return var_return
+
+    
+    
 
 
-def get_price(ticker):
+
+def get_price(ticker, username):
     if len(ticker) == 0:
         '''
         Esse IF verifica se o usuário não passou como argumento do comando
@@ -154,10 +163,13 @@ def get_price(ticker):
 
         var_return = {'status': 'Empyt',
                     'message': 'Você precisa informar o ticket da ação'}
+        not_handled('user', '/price', username)
+        not_handled('agent', var_return['message'], username)
         return var_return
 
 
     ticker = ticker[0].upper()
+    send_menssage('/price', 'user', ticker, username)
     busca = BASE_API_URL + "stocks/" + ticker
     json = requests.get(busca)
 
@@ -186,10 +198,14 @@ def get_price(ticker):
         else:
             var_return = {'status': '0',
             'message': "O servidor das cotações está indisponível no momento"}
+    
+    send_menssage('/price', 'agent', var_return['message'], username)
+
     return var_return
 
 
-def get_bitcoin():
+def get_bitcoin(username):
+    send_menssage('/bitcoin', 'user', '', username)
     buscabtc = BISCOINT
     jsonbtc = requests.get(buscabtc)
     if(jsonbtc.status_code == 200):
@@ -200,19 +216,27 @@ def get_bitcoin():
     else:
         var_return = {'status': '0',
         'message': "Sistema temporariamente indisponível"}
-    return var_return
+    
     string_log = "Comando /Bitcoin Acionado"
     logging.info(string_log)
 
+    send_menssage('/bitcoin', 'agent', var_return['message'], username)
+    
+    return var_return
+    
 
-def get_fundamentus(ticker):
+
+def get_fundamentus(ticker, username):
     if len(ticker) == 0:
         var_return = {'status': '0',
         'message': "Você precisa informar o ticket da ação"}
+        not_handled('user', '/fundamentus', username)
+        not_handled('agent', var_return['message'], username)
         return var_return
 
     busca = PHOEMUR
     ticker = ticker[0].upper()
+    send_menssage('/Fundamentus', 'user', ticker, username)
     busca1 = requests.get(busca)
     if (busca1.status_code == 200):
         busca1 = busca1.json()
@@ -277,10 +301,11 @@ def get_fundamentus(ticker):
         var_return = {'status': '0',
         'message': 'O sistema está fora do ar por um motivo desconhecido'}
 
+    send_menssage('/Fundamentus', 'agent', var_return['message'], username)
     return var_return
 
 
-def get_graham(ticker):
+def get_graham(ticker, username):
 
     def grahamprice(ticker):
         busca = BASE_API_URL + "stocks/" + ticker
@@ -292,9 +317,12 @@ def get_graham(ticker):
     if len(ticker) == 0:
         var_return = {'status': '0',
         'message': "Você precisa informar o ticket da ação"}
+        not_handled('user', '/graham', username)
+        not_handled('agent', var_return['message'], username)
         return var_return
 
     ticker = ticker[0].upper()
+    send_menssage('/Graham', 'user', ticker, username)
     graham_url = BASE_API_URL + "stocks/indicators/" + ticker
     json = requests.get(graham_url)
     if(json.status_code == 200):
@@ -349,6 +377,7 @@ def get_graham(ticker):
     string_log = f"{ticker}, {vpa}, {lpa}"
     logging.info(string_log)
     
+    send_menssage('/Graham', 'agent', var_return['message'], username)
     return var_return
 
 
