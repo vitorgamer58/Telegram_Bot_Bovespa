@@ -15,12 +15,10 @@ logging.basicConfig(level=logging.INFO,
 
 
 def fechamento(update, context):
-    call_function = get_fechamento(update.message.from_user['username'])
     context.bot.send_message(
         chat_id = update.message.chat_id,
         text = call_function['message']
     )
-    send_menssage('/fechamento', 'user', '', update.message.from_user['username'])
 
 def start(update, context):
     context.bot.send_message(
@@ -71,6 +69,13 @@ def graham(update, context):
         text = call_function['message']
     )
 
+def fii (update, context):
+    call_function = get_fii(context.arg, update.message.from_user['username'])
+    context.bot.send_message(
+        chat_id = update.message.chat_id,
+        text = call_function['message']
+    )
+
 def unknown(update, context):
     context.bot.send_message(
         chat_id=update.message.chat_id,
@@ -98,6 +103,9 @@ def main():
     )
     dispatcher.add_handler(
         CommandHandler('fechamento', fechamento, pass_args=False)
+    )
+    dispatcher.add_handler(
+        CommandHandler('fii', fii, pass_args=True)
     )
     dispatcher.add_handler(
         MessageHandler(Filters.command, unknown)

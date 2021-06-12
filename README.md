@@ -7,17 +7,19 @@ abra /src/conf/.env e digite o token do seu bot do telegram na linha 1 e então 
     pip install -r requirements.txt
     python scr/core.py
 
-e então baixe o programa [phoemur](https://github.com/phoemur/fundamentus) e na pasta raiz deste digite
+e então rode o programa [phoemur](https://github.com/phoemur/fundamentus) disponibilizado como submódulo deste projeto, na pasta raiz deste digite>
 
-    python fundamentos.py
+    python phoemur/fundamentos.py
+    python phoemur/server.py
 
-com os dois programas rodando, basta usar
+Várias funções do bot precisam que o arquivo server.py esteja rodando, pois é ele que responde com indicadores fundamentalistas baixados do site [fundamentus](https://fundamentus.com.br/)
 
 ## Funcionamento em Funções
 A função principal do Bot é retornar a cotação de alguma ação listada na Bolsa de Valores B3, de acordo com a solicitação do usuário, a solicitação das cotações se dá através da API [mfinance](https://mfinance.com.br/swagger/index.html), a solicitação dos fundamentos atráves do programa phoemur, e o preço do bitcoin atráves da api da biscoint.
 | Funções | Descrição |
 |--|--|
 | /price + código da ação | retorna a cotação e a variação no dia |
+| /fii + código do fundo | retorna a cotação, a variação no dia e o dividend yield dos ultimos 12 meses de acordo com a cotação do dia
 | /bitcoin	| retorna a cotação do bitcoin |
 | /fundamentus + código da ação | retorna indicadores fundamentalistas
 | /graham + código da ação | retorna o valor justo de acordo com a fórmula de Graham

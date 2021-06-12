@@ -3,7 +3,7 @@
 import requests
 import json
 
-api_key = 'YOUR_API_KEY_HERE
+api_key = 'YOUR_API_KEY_HERE'
 url = 'https://chatbase-area120.appspot.com/api/message'
 
 
@@ -42,5 +42,3 @@ def not_handled(type, mensagem, username):
     
     resposta = requests.post(url, data = json.dumps(body), headers=headers)
     print('Envio OK')
-
-# send_menssage('price', 'user', 'ROMI3', 'user-00')
