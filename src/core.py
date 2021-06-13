@@ -15,6 +15,7 @@ logging.basicConfig(level=logging.INFO,
 
 
 def fechamento(update, context):
+    call_function = get_fechamento(update.message.from_user['username'])
     context.bot.send_message(
         chat_id = update.message.chat_id,
         text = call_function['message']
@@ -70,7 +71,7 @@ def graham(update, context):
     )
 
 def fii (update, context):
-    call_function = get_fii(context.arg, update.message.from_user['username'])
+    call_function = get_fii(context.args, update.message.from_user['username'])
     context.bot.send_message(
         chat_id = update.message.chat_id,
         text = call_function['message']

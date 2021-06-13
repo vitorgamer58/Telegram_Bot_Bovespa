@@ -1,7 +1,7 @@
 # coding: utf-8
 # vitorgamer58
 
-from src.analyse import not_handled, send_menssage
+from analyse import not_handled, send_menssage
 import requests
 import logging
 import math
@@ -26,7 +26,7 @@ logging.basicConfig(level=logging.INFO,
 
 
 def get_fechamento(username):
-    send_menssage('/fechamento', 'user', '', update.message.from_user['username'])
+    send_menssage('/fechamento', 'user', '', username)
     with open('../bovespa_indice2.csv', newline='') as f:
         reader = csv.reader(f)
         list_ibov = list(reader)
