@@ -8,7 +8,8 @@ abra /src/conf/.env e digite o token do seu bot do telegram na linha 1 e então 
     python scr/core.py
 
 e então rode o programa [phoemur](https://github.com/phoemur/fundamentus) disponibilizado como submódulo deste projeto, na pasta raiz deste digite>
-
+    
+    pip install -r required.txt
     python phoemur/fundamentos.py
     python phoemur/server.py
 
@@ -24,6 +25,9 @@ A função principal do Bot é retornar a cotação de alguma ação listada na 
 | /fundamentus + código da ação | retorna indicadores fundamentalistas
 | /graham + código da ação | retorna o valor justo de acordo com a fórmula de Graham
 | /fechamento | retorna as maiores altas e baixas do ibovespa
+
+## Problemas e Bugs conhecidos
+O bot pode retornar um erro no console ao usar o comando /fechamento, sendo o erro envolvendo o arquivo bovespa_indice2.csv - isso se dá por um problema envolvendo diferentes sistemas operacionais, foi constatado que este erro acontece no Linux, porém não no Windows.
 
 ## Devidos créditos e direitos autorais de terceiros
 O código base para a criação deste bot se deu por um tutorial postado no medium.com de autoria do Mauro de Carvalho, que pode ser encontrado aqui: [https://medium.com/](https://medium.com/@mdcg.dev/desenvolvendo-o-seu-primeiro-chatbot-no-telegram-com-python-a9ad787bdf6)
