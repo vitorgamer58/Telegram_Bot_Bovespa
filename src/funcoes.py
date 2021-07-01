@@ -1,7 +1,7 @@
 # coding: utf-8
 # vitorgamer58
 
-from analyse import not_handled, send_menssage
+#from analyse import not_handled, #send_menssage
 import requests
 import logging
 import math
@@ -15,7 +15,7 @@ import csv
 
 from datetime import date
 
-from analyse import *
+#from analyse import *
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -26,7 +26,7 @@ logging.basicConfig(level=logging.INFO,
 
 
 def get_fechamento(username):
-    send_menssage('/fechamento', 'user', '', username)
+    #send_menssage('/fechamento', 'user', '', username)
     with open('../bovespa_indice2.csv', newline='') as f:
         reader = csv.reader(f)
         list_ibov = list(reader)
@@ -139,7 +139,7 @@ def get_fechamento(username):
                          "\n"
                          f'5️⃣ {mais_negociadas[8]} {mais_negociadas[9]}%')
     
-    send_menssage('/fechamento', 'agent', string_de_retorno, username)
+    #send_menssage('/fechamento', 'agent', string_de_retorno, username)
 
     # Imprime no log
     string_log = "/Comando fechamento Acionado"
@@ -164,13 +164,13 @@ def get_price(ticker, username):
 
         var_return = {'status': 400,
                     'message': 'Você precisa informar o ticket da ação'}
-        not_handled('user', '/price', username)
-        not_handled('agent', var_return['message'], username)
+        #not_handled('user', '/price', username)
+        #not_handled('agent', var_return['message'], username)
         return var_return
 
 
     ticker = ticker[0].upper()
-    send_menssage('/price', 'user', ticker, username)
+    #send_menssage('/price', 'user', ticker, username)
     busca = BASE_API_URL + "stocks/" + ticker
     json = requests.get(busca)
 
@@ -200,13 +200,13 @@ def get_price(ticker, username):
             var_return = {'status': 503,
             'message': "O servidor das cotações está indisponível no momento"}
     
-    send_menssage('/price', 'agent', var_return['message'], username)
+    #send_menssage('/price', 'agent', var_return['message'], username)
 
     return var_return
 
 
 def get_bitcoin(username):
-    send_menssage('/bitcoin', 'user', '', username)
+    #send_menssage('/bitcoin', 'user', '', username)
     buscabtc = BISCOINT
     jsonbtc = requests.get(buscabtc)
     if(jsonbtc.status_code == 200):
@@ -221,7 +221,7 @@ def get_bitcoin(username):
     string_log = "Comando /Bitcoin Acionado"
     logging.info(string_log)
 
-    send_menssage('/bitcoin', 'agent', var_return['message'], username)
+    #send_menssage('/bitcoin', 'agent', var_return['message'], username)
     
     return var_return
     
@@ -231,13 +231,13 @@ def get_fundamentus(ticker, username):
     if len(ticker) == 0:
         var_return = {'status': 400,
         'message': "Você precisa informar o ticket da ação"}
-        not_handled('user', '/fundamentus', username)
-        not_handled('agent', var_return['message'], username)
+        #not_handled('user', '/fundamentus', username)
+        #not_handled('agent', var_return['message'], username)
         return var_return
 
     busca = PHOEMUR
     ticker = ticker[0].upper()
-    send_menssage('/Fundamentus', 'user', ticker, username)
+    #send_menssage('/Fundamentus', 'user', ticker, username)
     busca1 = requests.get(busca)
     if (busca1.status_code == 200):
         busca1 = busca1.json()
@@ -302,7 +302,7 @@ def get_fundamentus(ticker, username):
         var_return = {'status': 503,
         'message': 'O sistema está fora do ar por um motivo desconhecido'}
 
-    send_menssage('/Fundamentus', 'agent', var_return['message'], username)
+    #send_menssage('/Fundamentus', 'agent', var_return['message'], username)
     return var_return
 
 
@@ -318,12 +318,12 @@ def get_graham(ticker, username):
     if len(ticker) == 0:
         var_return = {'status': 503,
         'message': "Você precisa informar o ticket da ação"}
-        not_handled('user', '/graham', username)
-        not_handled('agent', var_return['message'], username)
+        #not_handled('user', '/graham', username)
+        #not_handled('agent', var_return['message'], username)
         return var_return
 
     ticker = ticker[0].upper()
-    send_menssage('/graham', 'user', ticker, username)
+    #send_menssage('/graham', 'user', ticker, username)
     graham_url = BASE_API_URL + "stocks/indicators/" + ticker
     json = requests.get(graham_url)
     if(json.status_code == 200):
@@ -378,7 +378,7 @@ def get_graham(ticker, username):
     string_log = f"{ticker}, {vpa}, {lpa}"
     logging.info(string_log)
     
-    send_menssage('/graham', 'agent', var_return['message'], username)
+    #send_menssage('/graham', 'agent', var_return['message'], username)
     return var_return
 
 def get_fii (ticker, username):
@@ -386,13 +386,13 @@ def get_fii (ticker, username):
     if len(ticker) == 0:
         # Retorna erro se a lista estiver vazia
         var_return = {'status': 400, 'message': 'Você precisa informar o ticket da ação'}
-        not_handled('user', '/fii', username)
-        not_handled('agent', var_return['message'], username)
+        #not_handled('user', '/fii', username)
+        #not_handled('agent', var_return['message'], username)
     
     if len(ticker) != 0:
         # Faz a requisição dos dados para a API
         ticker = ticker[0].upper()
-        send_menssage('/fii', 'user', ticker, username)
+        #send_menssage('/fii', 'user', ticker, username)
         get_fii = requests.get('https://mfinance.com.br/api/v1/fiis/'+ticker)
         get_dividendos = requests.get('https://mfinance.com.br/api/v1/fiis/dividends/'+ticker)
 
@@ -457,6 +457,6 @@ def get_fii (ticker, username):
             var_return = {'status': 503, 'message': f'A API mfinance está fora do ar por um motivo desconhecido, erro {get_fii.status_code}'}
     
     # Deve sempre haver um retorno da função!
-    send_menssage('/fi', 'agent', var_return['message'], username)
+    #send_menssage('/fi', 'agent', var_return['message'], username)
     return var_return
 
