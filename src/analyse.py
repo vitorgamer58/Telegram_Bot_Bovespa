@@ -1,4 +1,8 @@
-# coding: utf-8
+"""
+Starting June 23rd, 2021, Chatbase will be in maintenance mode and we will no longer accept any new bots. All API calls in Chatbase Analytics will stop working after September 27th, 2021
+"""
+
+""" # coding: utf-8
 # vitorgamer58
 import requests
 import json
@@ -42,3 +46,4 @@ def not_handled(type, mensagem, username):
     
     resposta = requests.post(url, data = json.dumps(body), headers=headers)
     print('Envio OK')
+ """
