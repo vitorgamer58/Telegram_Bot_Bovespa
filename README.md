@@ -2,7 +2,7 @@
 Este é o código Backend escrito em Python de um Bot do Telegram
 
 ## Instalação
-abra /src/conf/.env e digite o token do seu bot do telegram na linha 1 e então na pasta raiz, digite:
+abra /src/conf/.env.sample e digite o token do seu bot do telegram na linha 1, salve com arquivo com o nome .env em vez de .env.sample e então na pasta raiz, digite os seguintes comandos:
 
     pip install -r requirements.txt
     python scr/core.py
