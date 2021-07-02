@@ -2,12 +2,12 @@
 Este é o código Backend escrito em Python de um Bot do Telegram
 
 ## Instalação
-abra /src/conf/.env.sample e digite o token do seu bot do telegram na linha 1, salve com arquivo com o nome .env em vez de .env.sample e então na pasta raiz, digite os seguintes comandos:
+abra /src/conf/.env.sample e digite o token do seu bot do telegram na linha 1 e o token do [Coinlib](https://coinlib.io/) na linha 4, salve com arquivo com o nome .env em vez de .env.sample e então na pasta raiz, digite os seguintes comandos:
 
     pip install -r requirements.txt
     python scr/core.py
 
-e então rode o programa [phoemur](https://github.com/phoemur/fundamentus) disponibilizado como submódulo deste projeto, na pasta raiz deste digite>
+E então rode o programa [phoemur](https://github.com/phoemur/fundamentus) disponibilizado como submódulo deste projeto, na pasta raiz deste digite:
     
     pip install -r required.txt
     python phoemur/fundamentos.py
@@ -29,12 +29,15 @@ A função principal do Bot é retornar a cotação de alguma ação listada na 
 ## Problemas e Bugs conhecidos
 O bot pode retornar um erro no console ao usar o comando /fechamento, sendo o erro envolvendo o arquivo bovespa_indice2.csv - isso se dá por um problema envolvendo diferentes sistemas operacionais, foi constatado que este erro acontece no Linux, porém não no Windows.
 
+Pode ser resolvido trazendo o arquivo bovespa_indice2.csv para dentro da pasta src e alterando o caminho na linha 30 do arquivo funcoes.py para 'bovespa_indice2.csv'
+
+
 ## Devidos créditos e direitos autorais de terceiros
 O código base para a criação deste bot se deu por um tutorial postado no medium.com de autoria do Mauro de Carvalho, que pode ser encontrado aqui: [https://medium.com/](https://medium.com/@mdcg.dev/desenvolvendo-o-seu-primeiro-chatbot-no-telegram-com-python-a9ad787bdf6)
 
 O código base encontra-se aqui: [/commit/a64fe47fb1b5f101ea68736c3099d9b7f9a08b67](https://github.com/vitorgamer58/Telegram_Bot_Bovespa/commit/a64fe47fb1b5f101ea68736c3099d9b7f9a08b67)
 
-Para o preço do bitcoin usa-se a api da [Biscoint](https://biscoint.io/)
+Para o preço do bitcoin usa-se a api do [Coinlib](https://coinlib.io/)
 
 Alguns indicadores e o preço da ação derivam da API [mfinance](https://mfinance.com.br/swagger/index.html)
 

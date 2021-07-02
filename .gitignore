@@ -9,3 +9,4 @@ src/__pycache__/
 tests/__init__.py
 src/fechamento.py
 src/conf/.env
+__pycache__/

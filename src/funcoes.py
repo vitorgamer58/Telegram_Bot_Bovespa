@@ -9,7 +9,7 @@ import operator
 import csv
 from datetime import date
 
-from conf.settings import BASE_API_URL, TELEGRAM_TOKEN, BISCOINT, PHOEMUR
+from conf.settings import BASE_API_URL, TELEGRAM_TOKEN, PHOEMUR, COINLIB
 import operator
 import csv
 
@@ -207,13 +207,28 @@ def get_price(ticker, username):
 
 def get_bitcoin(username):
     #send_menssage('/bitcoin', 'user', '', username)
-    buscabtc = BISCOINT
+    buscabtc = f'https://coinlib.io/api/v1/coin?key={COINLIB}&pref=BRL&symbol=BTC'
     jsonbtc = requests.get(buscabtc)
     if(jsonbtc.status_code == 200):
         jsonbtc = jsonbtc.json()
-        pricebtc = jsonbtc['data']['last']
-        var_return = {'status': 200,
-        'message': f"O preço do Bitcoin é R$ {pricebtc}"}
+        if(jsonbtc['remaining'] > 0):
+            pricebtc = round(float(jsonbtc['price']), 2)
+            price_btc_usdt = round(float(jsonbtc['markets'][1]['price']), 2)
+            # float transforma a string em número de ponto flutuante
+            # round arredonda para duas casas decimais 
+            var_return = {'status': 200,
+            'message': (f"O preço do Bitcoin é R$ {pricebtc}"
+                        "\n"
+                        f"Ou US$ {price_btc_usdt}"
+                        "\n"
+                        "Com dados do Coinlib.io"
+                        "\n"
+                        "Compre Bitcoins pela [Bitpreço](https://bitpreco.com/?r=26758)")}
+        
+        else:
+            var_return = {'status': 200,
+            'message': "API do Coinlib chegou ao máximo de solicitações, tente novamente mais tarde."}
+
     else:
         var_return = {'status': 503,
         'message': "Sistema temporariamente indisponível"}
