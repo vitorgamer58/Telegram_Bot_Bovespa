@@ -88,25 +88,25 @@ def main():
     updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(
-        CommandHandler('start', start)
+        CommandHandler('start', start, run_async=True)
     )
     dispatcher.add_handler(
-        CommandHandler('price', price, pass_args=True)
+        CommandHandler('price', price, pass_args=True, run_async=True)
     )
     dispatcher.add_handler(
-        CommandHandler('bitcoin', bitcoin, pass_args=False)
+        CommandHandler('bitcoin', bitcoin, pass_args=False, run_async=True)
     )
     dispatcher.add_handler(
-        CommandHandler('fundamentus', fundamentus, pass_args=True)
+        CommandHandler('fundamentus', fundamentus, pass_args=True, run_async=True)
     )
     dispatcher.add_handler(
-        CommandHandler('graham', graham, pass_args=True)
+        CommandHandler('graham', graham, pass_args=True, run_async=True)
     )
     dispatcher.add_handler(
-        CommandHandler('fechamento', fechamento, pass_args=False)
+        CommandHandler('fechamento', fechamento, pass_args=False, run_async=True)
     )
     dispatcher.add_handler(
-        CommandHandler('fii', fii, pass_args=True)
+        CommandHandler('fii', fii, pass_args=True, run_async=True)
     )
     dispatcher.add_handler(
         MessageHandler(Filters.command, unknown)
