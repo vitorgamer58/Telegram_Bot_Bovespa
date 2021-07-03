@@ -37,7 +37,9 @@ def get_fechamento(username):
     data_stocks = data_stocks.json()
 
     # obter variação do indice Ibovespa
-    ibov = data_stocks['stocks'][0]['change']
+    ibov = [i for i in data_stocks['stocks']
+                   if (i['symbol'] in 'IBOV')]
+    ibov = ibov[0]['change']
 
     # organiza pela alteração no dia - itemgetter('change')
     data_stocks['stocks'].sort(key=operator.itemgetter('change'))
