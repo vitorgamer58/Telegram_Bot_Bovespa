@@ -39,7 +39,7 @@ O código base encontra-se aqui: [/commit/a64fe47fb1b5f101ea68736c3099d9b7f9a08b
 
 Para o preço do bitcoin usa-se a api do [Coinlib](https://coinlib.io/)
 
-Alguns indicadores e o preço da ação derivam da API [mfinance](https://mfinance.com.br/swagger/index.html)
+Alguns indicadores e o preço da ação derivam da API [mfinance](https://mfinance.com.br/swagger/index.html) ou [OkaneBox](https://www.okanebox.com.br/)
 
 ### Fundamentus
 Utiliza-se o código [phoemur](https://github.com/phoemur/fundamentus) que puxa os dados do site [Fundamentus](https://fundamentus.com.br/) 
