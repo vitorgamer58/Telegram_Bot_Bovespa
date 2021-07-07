@@ -1,12 +1,9 @@
 # coding: utf-8
 # vitorgamer58
-from typing import Text
-from funcoes import *
 from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 from conf.settings import TELEGRAM_TOKEN
 import logging
 from funcoes import *
-from analyse import *
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
