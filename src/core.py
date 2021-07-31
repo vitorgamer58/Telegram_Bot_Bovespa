@@ -15,9 +15,10 @@ logging.basicConfig(level=logging.INFO,
 def fechamento(update, context):
     call_function = get_fechamento(update.message.from_user['username'])
     context.bot.send_message(
-        chat_id = update.message.chat_id,
-        text = call_function['message']
+        chat_id=update.message.chat_id,
+        text=call_function['message']
     )
+
 
 def start(update, context):
     context.bot.send_message(
@@ -37,44 +38,48 @@ def start(update, context):
 
 
 def price(update, context):
-    call_function = get_price(context.args, update.message.from_user['username'])
+    call_function = get_price(
+        context.args, update.message.from_user['username'])
     context.bot.send_message(
-        chat_id = update.message.chat_id,
-        text = call_function['message']
+        chat_id=update.message.chat_id,
+        text=call_function['message']
     )
 
 
 def bitcoin(update, context):
     call_function = get_bitcoin(update.message.from_user['username'])
     context.bot.send_message(
-        chat_id = update.message.chat_id,
-        text = call_function['message'],
-        parse_mode = 'Markdown'
+        chat_id=update.message.chat_id,
+        text=call_function['message'],
+        parse_mode='Markdown'
     )
 
 
 def fundamentus(update, context):
-    call_function = get_fundamentus(context.args, update.message.from_user['username'])
+    call_function = get_fundamentus(
+        context.args, update.message.from_user['username'])
     context.bot.send_message(
-        chat_id = update.message.chat_id,
-        text = call_function['message']
+        chat_id=update.message.chat_id,
+        text=call_function['message']
     )
-
 
 
 def graham(update, context):
-    call_function = get_graham(context.args, update.message.from_user['username'])
+    call_function = get_graham(
+        context.args, update.message.from_user['username'])
     context.bot.send_message(
-        chat_id = update.message.chat_id,
-        text = call_function['message']
+        chat_id=update.message.chat_id,
+        text=call_function['message']
     )
 
-def fii (update, context):
+
+def fii(update, context):
     call_function = get_fii(context.args, update.message.from_user['username'])
     context.bot.send_message(
-        chat_id = update.message.chat_id,
-        text = call_function['message']
+        chat_id=update.message.chat_id,
+        text=call_function['message']
     )
+
 
 def unknown(update, context):
     context.bot.send_message(
@@ -82,18 +87,29 @@ def unknown(update, context):
         text="Não Entendi"
     )
 
+
 def sobre(update, context):
     context.bot.send_message(
         chat_id=update.message.chat_id,
         text=("Este é um bot Open-Source, cujo código fonte está disponível no [Github](https://github.com/vitorgamer58/Telegram_Bot_Bovespa)"
-        "\n"
-        f"Criado por [vitorgamer58](tg://user?id=409733392) e está licenciado sob licença MIT"
-        "\n"
-        "Siga-me nas redes sociais: [Youtube](https://www.youtube.com/channel/UCn00U9AApstVzfJpFD9ALEA) e [Instagram](https://www.instagram.com/investimentosdovitor/)"
-        "\n"
-        "Em meu [Linktree](https://linktr.ee/investimentosdovitor) você pode encontrar mais links úteis, como cursos de investimento e corretoras de Bitcoin"),
+              "\n"
+              f"Criado por [vitorgamer58](tg://user?id=409733392) e está licenciado sob licença MIT"
+              "\n"
+              "Siga-me nas redes sociais: [Youtube](https://www.youtube.com/channel/UCn00U9AApstVzfJpFD9ALEA) e [Instagram](https://www.instagram.com/investimentosdovitor/)"
+              "\n"
+              "Em meu [Linktree](https://linktr.ee/investimentosdovitor) você pode encontrar mais links úteis, como cursos de investimento e corretoras de Bitcoin"),
         parse_mode="Markdown"
     )
+
+
+def cripto(update, context):
+    call_function = get_cripto(context.args)
+    context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text=call_function['message'],
+        parse_mode='Markdown'
+    )
+
 
 def main():
     updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
@@ -108,16 +124,21 @@ def main():
         CommandHandler('bitcoin', bitcoin, pass_args=False, run_async=True)
     )
     dispatcher.add_handler(
-        CommandHandler('fundamentus', fundamentus, pass_args=True, run_async=True)
+        CommandHandler('fundamentus', fundamentus,
+                       pass_args=True, run_async=True)
     )
     dispatcher.add_handler(
         CommandHandler('graham', graham, pass_args=True, run_async=True)
     )
     dispatcher.add_handler(
-        CommandHandler('fechamento', fechamento, pass_args=False, run_async=True)
+        CommandHandler('fechamento', fechamento,
+                       pass_args=False, run_async=True)
     )
     dispatcher.add_handler(
         CommandHandler('fii', fii, pass_args=True, run_async=True)
+    )
+    dispatcher.add_handler(
+        CommandHandler('cripto', cripto, pass_args=True, run_async=True)
     )
     dispatcher.add_handler(
         CommandHandler('sobre', sobre, pass_args=False, run_async=True)

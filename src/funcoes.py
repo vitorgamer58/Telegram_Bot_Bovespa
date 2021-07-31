@@ -332,23 +332,23 @@ def get_graham(ticker, username):
         json = json.json()
         price = json['lastPrice']
         return price
-        
+
     def returnMessage(vpa, lpa, ticker):
-            graham = calculaPrecoJusto(vpa, lpa)
-            price = stock_price(ticker)
-            desconto_agio = round(((price/graham)-1)*100, 2)
+        graham = calculaPrecoJusto(vpa, lpa)
+        price = stock_price(ticker)
+        desconto_agio = round(((price/graham)-1)*100, 2)
 
-            if(desconto_agio <= 0):
-                resultado = 'desconto'
-            else:
-                resultado = 'ágio'
+        if(desconto_agio <= 0):
+            resultado = 'desconto'
+        else:
+            resultado = 'ágio'
 
-            string_de_retorno = (f"O preço justo da ação {ticker} segundo a fórmula de Graham é: R$ {graham}"
-                                "\n"
-                                f"Com um {resultado} de {abs(desconto_agio)}%"
-                                "\n"
-                                f"Preço: {price}  VPA: {vpa}  LPA: {lpa}")
-            return string_de_retorno
+        string_de_retorno = (f"O preço justo da ação {ticker} segundo a fórmula de Graham é: R$ {graham}"
+                             "\n"
+                             f"Com um {resultado} de {abs(desconto_agio)}%"
+                             "\n"
+                             f"Preço: {price}  VPA: {vpa}  LPA: {lpa}")
+        return string_de_retorno
 
     def get_graham_okanebox(ticker):
         busca = OKANE + ticker
@@ -357,13 +357,13 @@ def get_graham(ticker, username):
             json = requisicao.json()
             lista = ['LPA', 'VPA']
             vpa_lpa = [i for i in json
-                    if (i['title'] in lista)]
+                       if (i['title'] in lista)]
             lpa = round(vpa_lpa[0]['value'], 2)
             vpa = round(vpa_lpa[1]['value'], 2)
             # round arredonda para duas casas decimais
             if (vpa > 0 and lpa > 0):
                 string_de_retorno = returnMessage(vpa, lpa, ticker)
-            
+
             elif(vpa < 0):
                 string_de_retorno = ("VPA menor que zero, não é possível calcular!"
                                      "\n"
@@ -373,16 +373,15 @@ def get_graham(ticker, username):
                 string_de_retorno = ("LPA menor que zero, não é possível calcular!"
                                      "\n"
                                      f"VPA: {vpa}  LPA: {lpa}")
-        
+
         elif(requisicao.status_code == 404 or requisicao.status_code == 500):
             string_de_retorno = f'O ativo {ticker} não foi encontrado'
 
         else:
             string_de_retorno = 'Os servidores mfinance e okanebox estão fora do ar'
-        
-        string_de_retorno += ('\n''Fonte: OkaneBox')        
-        return string_de_retorno
 
+        string_de_retorno += ('\n''Fonte: OkaneBox')
+        return string_de_retorno
 
     if len(ticker) == 0:
         var_return = {'status': 503,
@@ -427,7 +426,7 @@ def get_graham(ticker, username):
                 # Chama a API OkaneBox
                 string_de_retorno = get_graham_okanebox(ticker)
                 var_return = {'status': 200,
-                            'message': string_de_retorno}
+                              'message': string_de_retorno}
 
     else:
         # Caso a API mfinance esteja fora do ar...
@@ -435,8 +434,7 @@ def get_graham(ticker, username):
         get_graham_okanebox(ticker)
         string_de_retorno = get_graham_okanebox(ticker)
         var_return = {'status': 200,
-                        'message': string_de_retorno}
-
+                      'message': string_de_retorno}
 
     string_log = f"Comando /graham acionado, {ticker}"
     logging.info(string_log)
@@ -533,3 +531,39 @@ def get_fii(ticker, username):
     #send_menssage('/fi', 'agent', var_return['message'], username)
     return var_return
 
+
+def get_cripto(ticker):
+    if len(ticker) == 0:
+        # Retorna erro se a lista estiver vazia
+        var_return = {'status': 400,
+                      'message': 'Você precisa informar o ticket da ação'}
+        #not_handled('user', '/fii', username)
+        #not_handled('agent', var_return['message'], username)
+    else:
+        ticker = ticker[0].upper()
+        buscacripto = f'https://coinlib.io/api/v1/coin?key={COINLIB}&pref=BRL&symbol={ticker}'
+        jsoncripto = requests.get(buscacripto, headers=default_headers)
+        if(jsoncripto.status_code == 200):
+            jsoncripto = jsoncripto.json()
+            if(jsoncripto['remaining'] > 0):
+                pricecripto= round(float(jsoncripto['price']), 2)
+                # price_cripto_usdt = round(float(jsoncripto['markets'][1]['price']), 2)
+                # float transforma a string em número de ponto flutuante
+                # round arredonda para duas casas decimais
+                var_return = {'status': 200,
+                              'message': (f"O preço é R$ {pricecripto}"
+                                          "\n"
+                                          "Com dados do Coinlib.io")}
+            else:
+                var_return = {'status': 200,
+                          'message': "API do Coinlib chegou ao máximo de solicitações, tente novamente mais tarde."}
+                     
+        else:
+            var_return = {'status': 503,
+                      'message': "Sistema temporariamente indisponível"}
+
+    string_log = f"Comando /Coin {ticker} Acionado"
+    logging.info(string_log)
+
+    #send_menssage('/bitcoin', 'agent', var_return['message'], username)
+    return var_return
