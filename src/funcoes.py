@@ -15,8 +15,6 @@ import csv
 
 from datetime import date
 
-#from analyse import *
-
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
@@ -29,16 +27,18 @@ default_headers = {"user-agent": "telegram-bot-bovespa/1.3.0",
 
 
 def get_fechamento(username):
-    #send_menssage('/fechamento', 'user', '', username)
+    # Puxa os dados de todas as empresas listadas
+    data_stocks = requests.get(
+        'https://mfinance.com.br/api/v1/stocks', headers=default_headers)
+    if(data_stocks.status_code != 200):
+        return {'status': 503,
+                'message': "O servidor das cotações está indisponível no momento"}
+
+    data_stocks = data_stocks.json()
     with open('../bovespa_indice2.csv', newline='') as f:
         reader = csv.reader(f)
         list_ibov = list(reader)
         # obtem uma lista de ações do indice IBOVESPA
-
-    # Puxa os dados de todas as empresas listadas
-    data_stocks = requests.get(
-        'https://mfinance.com.br/api/v1/stocks', headers=default_headers)
-    data_stocks = data_stocks.json()
 
     # obter variação do indice Ibovespa
     ibov = [i for i in data_stocks['stocks']
@@ -145,16 +145,12 @@ def get_fechamento(username):
                          "\n"
                          f'5️⃣ {mais_negociadas[8]} {mais_negociadas[9]}%')
 
-    #send_menssage('/fechamento', 'agent', string_de_retorno, username)
-
     # Imprime no log
     string_log = "/Comando fechamento Acionado"
     logging.info(string_log)
 
-    var_return = {'status': 200,
-                  'message': string_de_retorno}
-
-    return var_return
+    return {'status': 200,
+            'message': string_de_retorno}
 
 
 def get_price(ticker, username):
@@ -164,14 +160,11 @@ def get_price(ticker, username):
         Em caso positivo, envia a mensagem e dá um return para finalizar a função
         '''
 
-        var_return = {'status': 400,
-                      'message': 'Você precisa informar o ticket da ação'}
-        #not_handled('user', '/price', username)
-        #not_handled('agent', var_return['message'], username)
-        return var_return
+        return {'status': 400,
+                'message': 'Você precisa informar o ticket da ação'}
 
     ticker = ticker[0].upper()
-    #send_menssage('/price', 'user', ticker, username)
+    # send_menssage('/price', 'user', ticker, username)
     busca = BASE_API_URL + "stocks/" + ticker
     json = requests.get(busca, headers=default_headers)
 
@@ -180,34 +173,31 @@ def get_price(ticker, username):
         priceaction = json['lastPrice']
         changeaction = json['change']
         symbol = json['symbol']
-
-        if priceaction == 0:
-            var_return = {'status': 404,
-                          'message': f"Código {ticker} não encontrado, tem certeza que está correto?"}
-        else:
-            var_return = {'status': 200,
-                          'message': f"O preço da ação {symbol} é: R$ {priceaction} sendo a variação no dia de {changeaction}%"}
-
         string_log = f"Comando /price acionado - {symbol}, {priceaction}"
         logging.info(string_log)
+
+        if priceaction == 0:
+            return {'status': 404,
+                    'message': f"Código {ticker} não encontrado, tem certeza que está correto?"}
+        else:
+            return {'status': 200,
+                    'message': f"O preço da ação {symbol} é: R$ {priceaction} sendo a variação no dia de {changeaction}%"}
 
     else:
 
         if(json.status_code == 404):
-            var_return = {'status': 404,
-                          'message': f"Código {ticker} não encontrado, tem certeza que está correto?"}
+            return {'status': 404,
+                    'message': f"Código {ticker} não encontrado, tem certeza que está correto?"}
 
         else:
-            var_return = {'status': 503,
-                          'message': "O servidor das cotações está indisponível no momento"}
-
-    #send_menssage('/price', 'agent', var_return['message'], username)
-
-    return var_return
+            return {'status': 503,
+                    'message': "O servidor das cotações está indisponível no momento"}
 
 
 def get_bitcoin(username):
-    #send_menssage('/bitcoin', 'user', '', username)
+    string_log = "Comando /Bitcoin Acionado"
+    logging.info(string_log)
+
     buscabtc = f'https://coinlib.io/api/v1/coin?key={COINLIB}&pref=BRL&symbol=BTC'
     jsonbtc = requests.get(buscabtc, headers=default_headers)
     if(jsonbtc.status_code == 200):
@@ -217,42 +207,32 @@ def get_bitcoin(username):
             price_btc_usdt = round(float(jsonbtc['markets'][1]['price']), 2)
             # float transforma a string em número de ponto flutuante
             # round arredonda para duas casas decimais
-            var_return = {'status': 200,
-                          'message': (f"O preço do Bitcoin é R$ {pricebtc}"
-                                      "\n"
-                                      f"Ou US$ {price_btc_usdt}"
-                                      "\n"
-                                      "Com dados do Coinlib.io"
-                                      "\n"
-                                      "Compre Bitcoins pela [Bitpreço](https://bitpreco.com/?r=26758)")}
+            return {'status': 200,
+                    'message': (f"O preço do Bitcoin é R$ {pricebtc}"
+                                "\n"
+                                f"Ou US$ {price_btc_usdt}"
+                                "\n"
+                                "Com dados do Coinlib.io"
+                                "\n"
+                                "Compre Bitcoins pela [Bitpreço](https://bitpreco.com/?r=26758)")}
 
         else:
-            var_return = {'status': 200,
-                          'message': "API do Coinlib chegou ao máximo de solicitações, tente novamente mais tarde."}
+            return {'status': 200,
+                    'message': "API do Coinlib chegou ao máximo de solicitações, tente novamente mais tarde."}
 
     else:
-        var_return = {'status': 503,
-                      'message': "Sistema temporariamente indisponível"}
-
-    string_log = "Comando /Bitcoin Acionado"
-    logging.info(string_log)
-
-    #send_menssage('/bitcoin', 'agent', var_return['message'], username)
-
-    return var_return
+        return {'status': 503,
+                'message': "Sistema temporariamente indisponível"}
 
 
 def get_fundamentus(ticker, username):
     if len(ticker) == 0:
-        var_return = {'status': 400,
-                      'message': "Você precisa informar o ticket da ação"}
-        #not_handled('user', '/fundamentus', username)
-        #not_handled('agent', var_return['message'], username)
-        return var_return
+        return {'status': 400,
+                'message': "Você precisa informar o ticket da ação"}
 
     busca = PHOEMUR
     ticker = ticker[0].upper()
-    #send_menssage('/Fundamentus', 'user', ticker, username)
+    # send_menssage('/Fundamentus', 'user', ticker, username)
     busca1 = requests.get(busca, headers=default_headers)
     if (busca1.status_code == 200):
         busca1 = busca1.json()
@@ -311,14 +291,11 @@ def get_fundamentus(ticker, username):
                              "\n"
                              f"ROIC: {roic}%")
 
-        var_return = {'status': 200,
-                      'message': string_de_retorno}
+        return {'status': 200,
+                'message': string_de_retorno}
     else:
-        var_return = {'status': 503,
-                      'message': 'O sistema está fora do ar por um motivo desconhecido'}
-
-    #send_menssage('/Fundamentus', 'agent', var_return['message'], username)
-    return var_return
+        return {'status': 503,
+                'message': 'O sistema está fora do ar por um motivo desconhecido'}
 
 
 def get_graham(ticker, username):
@@ -329,6 +306,9 @@ def get_graham(ticker, username):
     def stock_price(ticker):
         busca = BASE_API_URL + "stocks/" + ticker
         json = requests.get(busca, headers=default_headers)
+        if(json.status_code != 200):
+            return 0
+
         json = json.json()
         price = json['lastPrice']
         return price
@@ -336,6 +316,9 @@ def get_graham(ticker, username):
     def returnMessage(vpa, lpa, ticker):
         graham = calculaPrecoJusto(vpa, lpa)
         price = stock_price(ticker)
+        if (price == 0):
+            return "Sistema indisponível no momento"
+
         desconto_agio = round(((price/graham)-1)*100, 2)
 
         if(desconto_agio <= 0):
@@ -384,14 +367,11 @@ def get_graham(ticker, username):
         return string_de_retorno
 
     if len(ticker) == 0:
-        var_return = {'status': 503,
-                      'message': "Você precisa informar o ticket da ação"}
-        #not_handled('user', '/graham', username)
-        #not_handled('agent', var_return['message'], username)
-        return var_return
+        return {'status': 503,
+                'message': "Você precisa informar o ticket da ação"}
 
     ticker = ticker[0].upper()
-    #send_menssage('/graham', 'user', ticker, username)
+    # send_menssage('/graham', 'user', ticker, username)
     graham_url = BASE_API_URL + "stocks/indicators/" + ticker
     json = requests.get(graham_url, headers=default_headers)
     if(json.status_code == 200):
@@ -439,7 +419,7 @@ def get_graham(ticker, username):
     string_log = f"Comando /graham acionado, {ticker}"
     logging.info(string_log)
 
-    #send_menssage('/graham', 'agent', var_return['message'], username)
+    # send_menssage('/graham', 'agent', var_return['message'], username)
     return var_return
 
 
@@ -447,123 +427,109 @@ def get_fii(ticker, username):
     # Ticker deve ser uma lista!
     if len(ticker) == 0:
         # Retorna erro se a lista estiver vazia
-        var_return = {'status': 400,
-                      'message': 'Você precisa informar o ticket da ação'}
-        #not_handled('user', '/fii', username)
-        #not_handled('agent', var_return['message'], username)
+        return {'status': 400,
+                'message': 'Você precisa informar o ticket da ação'}
 
-    if len(ticker) != 0:
-        # Faz a requisição dos dados para a API
-        ticker = ticker[0].upper()
-        #send_menssage('/fii', 'user', ticker, username)
-        get_fii = requests.get(
+    # Faz a requisição dos dados para a API
+    ticker = ticker[0].upper()
+    get_fii = requests.get(
             'https://mfinance.com.br/api/v1/fiis/'+ticker, headers=default_headers)
-        get_dividendos = requests.get(
+    get_dividendos = requests.get(
             'https://mfinance.com.br/api/v1/fiis/dividends/'+ticker, headers=default_headers)
 
-        if get_fii.status_code == 200 and get_dividendos.status_code == 200:
-            # Transforma em Json e possibilita tratar os dados
-            get_fii = get_fii.json()
-            get_dividendos = get_dividendos.json()
+    if get_fii.status_code == 200 and get_dividendos.status_code == 200:
+        # Transforma em Json e possibilita tratar os dados
+        get_fii = get_fii.json()
+        get_dividendos = get_dividendos.json()
 
-            if get_fii['lastPrice'] != 0 and get_dividendos['dividends'] != None:
-                """
-                Verifica se o preço e o dividendo são diferentes de zero, pois a API mfinance
-                Costuma responder com 200 informando valores zerados quando se solicita um código
-                que não existe.
-                """
-                # Somar os 12 ultimos dividendos
-                dividendos = 0
-                soma_dividendos = 0
+        if get_fii['lastPrice'] != 0 and get_dividendos['dividends'] != None:
+            """
+            Verifica se o preço e o dividendo são diferentes de zero, pois a API mfinance
+            Costuma responder com 200 informando valores zerados quando se solicita um código
+            que não existe.
+            """
+            # Somar os 12 ultimos dividendos
+            dividendos = 0
+            soma_dividendos = 0
 
-                '''
-                Alguns fundos não possuem histórico com mais de 12 meses, necessita de uma estrutra if
-                para evitar o erro list index out of range
-                '''
+            '''
+            Alguns fundos não possuem histórico com mais de 12 meses, necessita de uma estrutra if
+            para evitar o erro list index out of range
+            '''
 
-                if len(get_dividendos['dividends']) < 12:
-                    ciclos = len(get_dividendos)-1
-                    # Conta a quantidade e reduz em 1
-                else:
-                    ciclos = 11
-                    # São 12 meses, começando do zero até o onze, resultando em 12
-
-                while dividendos <= ciclos:
-                    # print(dividendos)
-                    soma_dividendos = soma_dividendos + \
-                        get_dividendos['dividends'][dividendos]['value']
-                    # Var dividendos indica a posição do valor no dict
-                    dividendos += 1
-
-                # Arredonda 2 casas decimais
-                soma_dividendos = round(soma_dividendos, 2)
-
-                # Calcula o dividend yield
-                dividend_yield = (soma_dividendos /
-                                  get_fii['closingPrice'])*100
-                round(dividend_yield, 2)  # Arredonda
-
-                string_de_retorno = (f"O preço do FII {ticker} é: R$ {get_fii['closingPrice']} sendo a variação no dia de {get_fii['change']}%"
-                                     '\n'
-                                     f'Neste preço, o dividend yield (12m) é de {round(dividend_yield, 2)}% com uma distribuição de R$ {round(soma_dividendos, 2)}')
-                var_return = {'status': 200, 'message': string_de_retorno}
+            if len(get_dividendos['dividends']) < 12:
+                ciclos = len(get_dividendos)-1
+                # Conta a quantidade e reduz em 1
             else:
-                """
-                Caso algum dos valores seja zero, necessita um tratamento especial para identificar o fato.
-                """
-                if get_fii['closingPrice'] == 0 and get_dividendos['dividends'] == None:
-                    # Não encontrado na API, provavelmente este FII não existe
-                    var_return = {
-                        'status': 404, 'message': f'O fundo {ticker} não foi encontrado na API, tem certeza que digitou corretamente?'}
-                elif get_fii['closingPrice'] != 0 and get_dividendos['dividends'] == None:
-                    string_de_retorno = (f"O preço do FII {ticker} é: R$ {get_fii['closingPrice']} sendo a variação no dia de {get_fii['change']}%"
-                                         '\n'
-                                         'Ainda não foi encontrado um histórico de dividendos para este fundo, ele pode ser muito novo.')
-                    var_return = {'status': 200, 'message': string_de_retorno}
-                else:
-                    var_return = {'status': 500,
-                                  'message': 'erro desconhecido'}
+                ciclos = 11
+                # São 12 meses, começando do zero até o onze, resultando em 12
+
+            while dividendos <= ciclos:
+                # print(dividendos)
+                soma_dividendos = soma_dividendos + \
+                    get_dividendos['dividends'][dividendos]['value']
+                # Var dividendos indica a posição do valor no dict
+                dividendos += 1
+
+            # Arredonda 2 casas decimais
+            soma_dividendos = round(soma_dividendos, 2)
+
+            # Calcula o dividend yield
+            dividend_yield = (soma_dividendos /
+                                get_fii['closingPrice'])*100
+            round(dividend_yield, 2)  # Arredonda
+
+            string_de_retorno = (f"O preço do FII {ticker} é: R$ {get_fii['closingPrice']} sendo a variação no dia de {get_fii['change']}%"
+                                    '\n'
+                                    f'Neste preço, o dividend yield (12m) é de {round(dividend_yield, 2)}% com uma distribuição de R$ {round(soma_dividendos, 2)}')
+            return {'status': 200, 'message': string_de_retorno}
         else:
-            var_return = {
-                'status': 503, 'message': f'A API mfinance está fora do ar por um motivo desconhecido, erro {get_fii.status_code}'}
-
-    # Deve sempre haver um retorno da função!
-    #send_menssage('/fi', 'agent', var_return['message'], username)
-    return var_return
-
+            """
+            Caso algum dos valores seja zero, necessita um tratamento especial para identificar o fato.
+            """
+            if get_fii['closingPrice'] == 0 and get_dividendos['dividends'] == None:
+                # Não encontrado na API, provavelmente este FII não existe
+                var_return = {
+                    'status': 404, 'message': f'O fundo {ticker} não foi encontrado na API, tem certeza que digitou corretamente?'}
+            elif get_fii['closingPrice'] != 0 and get_dividendos['dividends'] == None:
+                string_de_retorno = (f"O preço do FII {ticker} é: R$ {get_fii['closingPrice']} sendo a variação no dia de {get_fii['change']}%"
+                                        '\n'
+                                        'Ainda não foi encontrado um histórico de dividendos para este fundo, ele pode ser muito novo.')
+                return {'status': 200, 'message': string_de_retorno}
+            else:
+                return {'status': 500,
+                                'message': 'erro desconhecido'}
+    else:
+        return {
+            'status': 503, 'message': f'A API mfinance está fora do ar por um motivo desconhecido, erro {get_fii.status_code}'}
 
 def get_cripto(ticker):
     if len(ticker) == 0:
         # Retorna erro se a lista estiver vazia
-        var_return = {'status': 400,
+        return {'status': 400,
                       'message': 'Você precisa informar o ticket da ação'}
-        #not_handled('user', '/fii', username)
-        #not_handled('agent', var_return['message'], username)
-    else:
-        ticker = ticker[0].upper()
-        buscacripto = f'https://coinlib.io/api/v1/coin?key={COINLIB}&pref=BRL&symbol={ticker}'
-        jsoncripto = requests.get(buscacripto, headers=default_headers)
-        if(jsoncripto.status_code == 200):
-            jsoncripto = jsoncripto.json()
-            if(jsoncripto['remaining'] > 0):
-                pricecripto= round(float(jsoncripto['price']), 2)
-                # price_cripto_usdt = round(float(jsoncripto['markets'][1]['price']), 2)
-                # float transforma a string em número de ponto flutuante
-                # round arredonda para duas casas decimais
-                var_return = {'status': 200,
-                              'message': (f"O preço é R$ {pricecripto}"
-                                          "\n"
-                                          "Com dados do Coinlib.io")}
-            else:
-                var_return = {'status': 200,
-                          'message': "API do Coinlib chegou ao máximo de solicitações, tente novamente mais tarde."}
-                     
-        else:
-            var_return = {'status': 503,
-                      'message': "Sistema temporariamente indisponível"}
 
     string_log = f"Comando /Coin {ticker} Acionado"
     logging.info(string_log)
 
-    #send_menssage('/bitcoin', 'agent', var_return['message'], username)
-    return var_return
+    ticker = ticker[0].upper()
+    buscacripto = f'https://coinlib.io/api/v1/coin?key={COINLIB}&pref=BRL&symbol={ticker}'
+    jsoncripto = requests.get(buscacripto, headers=default_headers)
+    if(jsoncripto.status_code == 200):
+        jsoncripto = jsoncripto.json()
+        if(jsoncripto['remaining'] > 0):
+            pricecripto = round(float(jsoncripto['price']), 2)
+            # price_cripto_usdt = round(float(jsoncripto['markets'][1]['price']), 2)
+            # float transforma a string em número de ponto flutuante
+            # round arredonda para duas casas decimais
+            return {'status': 200,
+                            'message': (f"O preço é R$ {pricecripto}"
+                                        "\n"
+                                        "Com dados do Coinlib.io")}
+        else:
+            return {'status': 200,
+                            'message': "API do Coinlib chegou ao máximo de solicitações, tente novamente mais tarde."}
+
+    else:
+        return {'status': 503,
+                        'message': "Sistema temporariamente indisponível"}
