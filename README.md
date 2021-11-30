@@ -2,22 +2,20 @@
 Este é o código Backend escrito em Python de um Bot do Telegram
 
 ## Instalação
-Clone este repositório com os seguintes comandos:
-    git clone https://github.com/vitorgamer58/Telegram_Bot_Bovespa.git bot_bovespa
-    cd bot_bovespa
-    git submodule init
-    git submodule update
+Clone este repositório com o seguintes comando:
+
+    git clone --recurse-submodules https://github.com/vitorgamer58/Telegram_Bot_Bovespa.git
 
 Isso garante que você fez o clone do repositório principal e do submódulo que é responsável pelos dados da análise fundamentalista. 
 
 abra src/conf/.env.sample e digite o token do seu bot do telegram na linha 1 e o token do [Coinlib](https://coinlib.io/) na linha 4, salve com arquivo com o nome .env em vez de .env.sample e então na pasta raiz, digite os seguintes comandos:
 
     pip install -r requirements.txt
-    python scr/core.py
+    python src/core.py
 
 E então rode o programa [phoemur](https://github.com/phoemur/fundamentus) disponibilizado como submódulo deste projeto, na pasta phoemur digite:
     
-    pip install -r required.txt
+    pip install -r phoemur/required.txt
     python phoemur/fundamentos.py
     python phoemur/server.py
 
