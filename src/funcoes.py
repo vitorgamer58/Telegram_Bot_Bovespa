@@ -9,7 +9,7 @@ import operator
 import csv
 from datetime import date
 
-from conf.settings import BASE_API_URL, TELEGRAM_TOKEN, PHOEMUR, COINLIB, OKANE
+from conf.settings import BASE_API_URL, PHOEMUR, COINLIB, OKANE
 import operator
 import csv
 
@@ -25,6 +25,9 @@ logging.basicConfig(level=logging.INFO,
 default_headers = {"user-agent": "telegram-bot-bovespa/1.3.0",
                    "Content-Type": "application/json;charset=UTF-8"}
 
+def dontHaveArguments(ticker):
+    if len(ticker) == 0: return True
+    else: return False
 
 def get_fechamento(username):
     # Puxa os dados de todas as empresas listadas
@@ -149,16 +152,8 @@ def get_fechamento(username):
     return {'status': 200,
             'message': string_de_retorno}
 
-
 def get_price(ticker, username):
-    if len(ticker) == 0:
-        '''
-        Esse IF verifica se o usuário não passou como argumento do comando
-        Em caso positivo, envia a mensagem e dá um return para finalizar a função
-        '''
-
-        return {'status': 400,
-                'message': 'Você precisa informar o ticket da ação'}
+    if(dontHaveArguments(ticker)): return {'message': 'Você precisa informar o ticket da ação'}
 
     ticker = ticker[0].upper()
     # send_menssage('/price', 'user', ticker, username)
@@ -190,7 +185,6 @@ def get_price(ticker, username):
             return {'status': 503,
                     'message': "O servidor das cotações está indisponível no momento"}
 
-
 def get_bitcoin(username):
     string_log = "Comando /Bitcoin Acionado"
     logging.info(string_log)
@@ -221,11 +215,8 @@ def get_bitcoin(username):
         return {'status': 503,
                 'message': "Sistema temporariamente indisponível"}
 
-
 def get_fundamentus(ticker, username):
-    if len(ticker) == 0:
-        return {'status': 400,
-                'message': "Você precisa informar o ticket da ação"}
+    if(dontHaveArguments(ticker)): return {'message': 'Você precisa informar o ticket da ação'}
 
     busca = PHOEMUR
     ticker = ticker[0].upper()
@@ -293,7 +284,6 @@ def get_fundamentus(ticker, username):
     else:
         return {'status': 503,
                 'message': 'O sistema está fora do ar por um motivo desconhecido'}
-
 
 def get_graham(ticker, username):
 
@@ -363,9 +353,7 @@ def get_graham(ticker, username):
         string_de_retorno += ('\n''Fonte: OkaneBox')
         return string_de_retorno
 
-    if len(ticker) == 0:
-        return {'status': 503,
-                'message': "Você precisa informar o ticket da ação"}
+    if(dontHaveArguments(ticker)): return {'message': 'Você precisa informar o ticket da ação'}
 
     ticker = ticker[0].upper()
     # send_menssage('/graham', 'user', ticker, username)
@@ -419,13 +407,8 @@ def get_graham(ticker, username):
     # send_menssage('/graham', 'agent', var_return['message'], username)
     return var_return
 
-
 def get_fii(ticker, username):
-    # Ticker deve ser uma lista!
-    if len(ticker) == 0:
-        # Retorna erro se a lista estiver vazia
-        return {'status': 400,
-                'message': 'Você precisa informar o ticket da ação'}
+    if(dontHaveArguments(ticker)): return {'message': 'Você precisa informar o ticket da ação'}
 
     # Faz a requisição dos dados para a API
     ticker = ticker[0].upper()
@@ -501,10 +484,7 @@ def get_fii(ticker, username):
             'status': 503, 'message': f'A API mfinance está fora do ar por um motivo desconhecido, erro {get_fii.status_code}'}
 
 def get_cripto(ticker):
-    if len(ticker) == 0:
-        # Retorna erro se a lista estiver vazia
-        return {'status': 400,
-                      'message': 'Você precisa informar o ticket da ação'}
+    if(dontHaveArguments(ticker)): return {'message': 'Você precisa informar o ticket da criptomoeda'}
 
     string_log = f"Comando /Coin {ticker} Acionado"
     logging.info(string_log)

@@ -29,6 +29,8 @@ def start(update, context):
         "\n"
         "/bitcoin (Responde com a cotação do bitcoin)"
         "\n"
+        "/cripto + Código da cripto (Responde com a cotação da cripto)"
+        "\n"
         "/fundamentus + Código da ação (Responde com o valor da ação)"
         "\n"
         "/graham + Código da ação (Responde com o preço justo segundo a fórmula de Graham)"
