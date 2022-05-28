@@ -12,15 +12,18 @@ class databaseClient:
         self.client = pymongo.MongoClient(self.mongodburl)
         self.db = self.client.clients_database.clients_collection
 
-    def addTelegramClient(self, chatId):
-        clientAlreadyExist = self.db.find_one({"chatId": chatId})
+    def addTelegramClient(self, chat_id):
+        clientAlreadyExist = self.db.find_one({"chat_id": chat_id})
         if(clientAlreadyExist): return False
-        clientAdded = self.db.insert_one({"chatId": chatId}).inserted_id
+        clientAdded = self.db.insert_one({"chat_id": chat_id}).inserted_id
         return True
     
-    def removeTelegramClient(self, chatId):
+    def removeTelegramClient(self, chat_id):
         try:
-            self.db.delete_one({"chatId": chatId})
+            self.db.delete_one({"chat_id": chat_id})
             return True
         except: return False
-
+    
+    def getAllClients(self):
+        clients = self.db.find({})
+        return clients

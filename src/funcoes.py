@@ -32,7 +32,7 @@ def dontHaveArguments(ticker):
     if len(ticker) == 0: return True
     else: return False
 
-def get_fechamento(username):
+def get_fechamento():
     # Puxa os dados de todas as empresas listadas
     data_stocks = requests.get(
         'https://mfinance.com.br/api/v1/stocks', headers=default_headers)
@@ -527,3 +527,7 @@ def descadastrar_fechamento(chat_id):
         return "Descadastrado com sucesso"
     else:
         return "Algum erro ocorreu"
+
+def get_all_clients():
+    clients = database.getAllClients()
+    return clients
