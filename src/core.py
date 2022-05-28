@@ -1,5 +1,6 @@
 # coding: utf-8
 # vitorgamer58
+from email import message
 from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 from conf.settings import TELEGRAM_TOKEN
 import logging
@@ -113,6 +114,30 @@ def cripto(update, context):
     )
 
 
+def cadastrarFechamento(update, context):
+    call_function = cadastrar_fechamento(update.message.chat_id)
+
+    context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text=call_function,
+    )
+
+
+def descadastrarFechamento(update, context):
+    call_function = descadastrar_fechamento(update.message.chat_id)
+
+    def message(result):
+        if(result):
+            return "Descadastrado com sucesso"
+        else:
+            return "Algum erro ocorreu"
+
+    context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text=message(call_function),
+    )
+
+
 def main():
     updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
@@ -144,6 +169,14 @@ def main():
     )
     dispatcher.add_handler(
         CommandHandler('sobre', sobre, pass_args=False, run_async=True)
+    )
+    dispatcher.add_handler(
+        CommandHandler("cadastrarfechamento", cadastrarFechamento,
+                       pass_args=False, run_async=True)
+    )
+    dispatcher.add_handler(
+        CommandHandler("descadastrarfechamento", descadastrarFechamento,
+                       pass_args=False, run_async=True)
     )
     dispatcher.add_handler(
         MessageHandler(Filters.command, unknown)
