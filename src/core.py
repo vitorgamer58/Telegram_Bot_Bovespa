@@ -1,6 +1,9 @@
 # coding: utf-8
 # vitorgamer58
-from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
+import datetime
+from email import message
+import pytz
+from telegram.ext import Updater, CommandHandler, Filters, MessageHandler, Updater, CallbackContext, JobQueue
 from conf.settings import TELEGRAM_TOKEN
 import logging
 from funcoes import *
@@ -13,7 +16,7 @@ logging.basicConfig(level=logging.INFO,
 
 
 def fechamento(update, context):
-    call_function = get_fechamento(update.message.from_user['username'])
+    call_function = get_fechamento()
     context.bot.send_message(
         chat_id=update.message.chat_id,
         text=call_function['message']
@@ -113,6 +116,41 @@ def cripto(update, context):
     )
 
 
+def cadastrarFechamento(update, context):
+    call_function = cadastrar_fechamento(update.message.chat_id)
+
+    context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text=call_function,
+    )
+
+
+def descadastrarFechamento(update, context):
+    call_function = descadastrar_fechamento(update.message.chat_id)
+
+    def message(result):
+        if(result):
+            return "Descadastrado com sucesso"
+        else:
+            return "Algum erro ocorreu"
+
+    context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text=message(call_function),
+    )
+
+
+def dailyFechamento(context: CallbackContext):
+    print("DailyFechamento disparado")
+    fechamentoDoDia = get_fechamento()
+    clients = get_all_clients()
+    for client in clients:
+        context.bot.send_message(
+            chat_id=client["chat_id"],
+            text=fechamentoDoDia["message"]
+        )
+
+
 def main():
     updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
@@ -146,8 +184,19 @@ def main():
         CommandHandler('sobre', sobre, pass_args=False, run_async=True)
     )
     dispatcher.add_handler(
+        CommandHandler("cadastrarfechamento", cadastrarFechamento,
+                       pass_args=False, run_async=True)
+    )
+    dispatcher.add_handler(
+        CommandHandler("descadastrarfechamento", descadastrarFechamento,
+                       pass_args=False, run_async=True)
+    )
+    dispatcher.add_handler(
         MessageHandler(Filters.command, unknown)
     )
+    updater.job_queue.run_daily(dailyFechamento, datetime.time(
+        hour=18, minute=30, tzinfo=pytz.timezone("America/Sao_Paulo")), days=(0, 1, 2, 3, 4))
+
     updater.start_polling()
 
     updater.idle()

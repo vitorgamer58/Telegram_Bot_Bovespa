@@ -12,6 +12,7 @@ from datetime import date
 from conf.settings import BASE_API_URL, PHOEMUR, COINLIB, OKANE
 import operator
 import csv
+from mongodb import *
 
 from datetime import date
 
@@ -25,11 +26,13 @@ logging.basicConfig(level=logging.INFO,
 default_headers = {"user-agent": "telegram-bot-bovespa/1.3.0",
                    "Content-Type": "application/json;charset=UTF-8"}
 
+database = databaseClient()
+
 def dontHaveArguments(ticker):
     if len(ticker) == 0: return True
     else: return False
 
-def get_fechamento(username):
+def get_fechamento():
     # Puxa os dados de todas as empresas listadas
     data_stocks = requests.get(
         'https://mfinance.com.br/api/v1/stocks', headers=default_headers)
@@ -510,3 +513,21 @@ def get_cripto(ticker):
     else:
         return {'status': 503,
                         'message': "Sistema temporariamente indisponível"}
+
+def cadastrar_fechamento(chat_id):
+    result = database.addTelegramClient(chat_id)
+    if(result):
+        return "Cadastrado com sucesso"
+    else:
+        return "Provavelmente você já está cadastrado"
+
+def descadastrar_fechamento(chat_id):
+    result = database.removeTelegramClient(chat_id)
+    if(result):
+        return "Descadastrado com sucesso"
+    else:
+        return "Algum erro ocorreu"
+
+def get_all_clients():
+    clients = database.getAllClients()
+    return clients
