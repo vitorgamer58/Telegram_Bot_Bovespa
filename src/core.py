@@ -1,7 +1,6 @@
 # coding: utf-8
 # vitorgamer58
 import datetime
-from email import message
 import pytz
 from telegram.ext import Updater, CommandHandler, Filters, MessageHandler, Updater, CallbackContext, JobQueue
 from conf.settings import TELEGRAM_TOKEN

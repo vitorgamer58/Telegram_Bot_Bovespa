@@ -6,12 +6,10 @@ import requests
 import logging
 import math
 import operator
-import csv
 from datetime import date
 
 from conf.settings import BASE_API_URL, PHOEMUR, COINLIB, OKANE
 import operator
-import csv
 from mongodb import *
 
 from datetime import date
