@@ -1,4 +1,5 @@
 from conf.settings import MONGODB
+from operator import itemgetter
 import pymongo
 
 """ MongoDB
@@ -10,13 +11,20 @@ class databaseClient:
     mongodburl = MONGODB
 
     def __init__(self):
-        self.db= pymongo.MongoClient(self.mongodburl).clients_database.clients_collection
+        self.db = pymongo.MongoClient(
+            self.mongodburl).clients_database.clients_collection
 
-    def addTelegramClient(self, chat_id):
-        clientAlreadyExist = self.db.find_one({"chat_id": chat_id})
+    def addTelegramClient(self, chat):
+        id, username, first_name = itemgetter(
+            'id', 'username', 'first_name')(chat)
+        clientAlreadyExist = self.db.find_one({"chat_id": id})
         if(clientAlreadyExist):
             return False
-        clientAdded = self.db.insert_one({"chat_id": chat_id}).inserted_id
+        self.db.insert_one({
+            "first_name": first_name,
+            "username": username,
+            "chat_id": id
+        })
         return True
 
     def removeTelegramClient(self, chat_id):

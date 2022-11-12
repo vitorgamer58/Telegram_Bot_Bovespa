@@ -512,8 +512,9 @@ def get_cripto(ticker):
         return {'status': 503,
                         'message': "Sistema temporariamente indisponível"}
 
-def cadastrar_fechamento(chat_id):
-    result = database.addTelegramClient(chat_id)
+def cadastrar_fechamento(chat):
+    result = database.addTelegramClient(chat)
+    
     if(result):
         return "Cadastrado com sucesso"
     else:

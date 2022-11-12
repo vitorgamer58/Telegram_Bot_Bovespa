@@ -116,7 +116,7 @@ def cripto(update, context):
 
 
 def cadastrarFechamento(update, context):
-    call_function = cadastrar_fechamento(update.message.chat_id)
+    call_function = cadastrar_fechamento(update.message.chat)
 
     context.bot.send_message(
         chat_id=update.message.chat_id,
@@ -143,6 +143,7 @@ def dailyFechamento(context: CallbackContext):
     print("DailyFechamento disparado")
     fechamentoDoDia = get_fechamento()
     clients = get_all_clients()
+
     for client in clients:
         context.bot.send_message(
             chat_id=client["chat_id"],
