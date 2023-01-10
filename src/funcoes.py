@@ -26,9 +26,13 @@ default_headers = {"user-agent": "telegram-bot-bovespa/1.3.0",
 
 database = databaseClient()
 
+
 def dontHaveArguments(ticker):
-    if len(ticker) == 0: return True
-    else: return False
+    if len(ticker) == 0:
+        return True
+    else:
+        return False
+
 
 def get_fechamento():
     # Puxa os dados de todas as empresas listadas
@@ -39,7 +43,8 @@ def get_fechamento():
                 'message': "O servidor das cotações está indisponível no momento"}
     data_stocks = data_stocks.json()
 
-    list_ibov = ["ALPA4","ABEV3","AMER3","ASAI3","AZUL4","B3SA3","BIDI11","BPAN4","BBSE3","BRML3","BBDC3","BBDC4","BRAP4","BBAS3","BRKM5","BRFS3","BPAC11","CRFB3","CCRO3","CMIG4","CIEL3","COGN3","CPLE6","CSAN3","CPFE3","CMIN3","CVCB3","CYRE3","DXCO3","ECOR3","ELET3","ELET6","EMBR3","ENBR3","ENGI11","ENEV3","EGIE3","EQTL3","EZTC3","FLRY3","GGBR4","GOAU4","GOLL4","NTCO3","SOMA3","HAPV3","HYPE3","IGTI11","GNDI3","IRBR3","ITSA4","ITUB4","JBSS3","JHSF3","KLBN11","RENT3","LCAM3","LWSA3","LAME4","LREN3","MGLU3","MRFG3","CASH3","BEEF3","MRVE3","MULT3","PCAR3","PETR3","PETR4","PRIO3","PETZ3","POSI3","QUAL3","RADL3","RDOR3","RAIL3","SBSP3","SANB11","CSNA3","SULA11","SUZB3","TAEE11","VIVT3","TIMS3","TOTS3","UGPA3","USIM5","VALE3","VIIA3","VBBR3","WEGE3","YDUQ3", "RRRP3"]
+    list_ibov = ["ABEV3", "ALPA4", "ALSO3", "AMER3", "ARZZ3", "ASAI3", "AZUL4", "B3SA3", "BBAS3", "BBDC3", "BBDC4", "BBSE3", "BEEF3", "BPAC11", "BPAN4", "BRAP4", "BRFS3", "BRKM5", "CASH3", "CCRO3", "CIEL3", "CMIG4", "CMIN3", "COGN3", "CPFE3", "CPLE6", "CRFB3", "CSAN3", "CSNA3", "CVCB3", "CYRE3", "DXCO3", "ECOR3", "EGIE3", "ELET3", "ELET6", "EMBR3", "ENBR3", "ENEV3", "ENGI11", "EQTL3", "EZTC3", "FLRY3", "GGBR4",
+                 "GOAU4", "GOLL4", "HAPV3", "HYPE3", "IGTI11", "ITSA4", "ITUB4", "JBSS3", "KLBN11", "LREN3", "LWSA3", "MGLU3", "MRFG3", "MRVE3", "MULT3", "NTCO3", "PCAR3", "PETR3", "PETR4", "PETZ3", "PRIO3", "QUAL3", "RADL3", "RAIL3", "RAIZ4", "RDOR3", "RENT3", "RRRP3", "SANB11", "SBSP3", "SLCE3", "SMTO3", "SOMA3", "SUZB3", "TAEE11", "TIMS3", "TOTS3", "UGPA3", "USIM5", "VALE3", "VBBR3", "VIIA3", "VIVT3", "WEGE3", "YDUQ3"]
 
     # obter variação do indice Ibovespa
     ibov = [i for i in data_stocks['stocks']
@@ -153,8 +158,10 @@ def get_fechamento():
     return {'status': 200,
             'message': string_de_retorno}
 
+
 def get_price(ticker, username):
-    if(dontHaveArguments(ticker)): return {'message': 'Você precisa informar o ticket da ação'}
+    if(dontHaveArguments(ticker)):
+        return {'message': 'Você precisa informar o ticket da ação'}
 
     ticker = ticker[0].upper()
     # send_menssage('/price', 'user', ticker, username)
@@ -186,6 +193,7 @@ def get_price(ticker, username):
             return {'status': 503,
                     'message': "O servidor das cotações está indisponível no momento"}
 
+
 def get_bitcoin(username):
     string_log = "Comando /Bitcoin Acionado"
     logging.info(string_log)
@@ -216,8 +224,10 @@ def get_bitcoin(username):
         return {'status': 503,
                 'message': "Sistema temporariamente indisponível"}
 
+
 def get_fundamentus(ticker, username):
-    if(dontHaveArguments(ticker)): return {'message': 'Você precisa informar o ticket da ação'}
+    if(dontHaveArguments(ticker)):
+        return {'message': 'Você precisa informar o ticket da ação'}
 
     busca = PHOEMUR
     ticker = ticker[0].upper()
@@ -285,6 +295,7 @@ def get_fundamentus(ticker, username):
     else:
         return {'status': 503,
                 'message': 'O sistema está fora do ar por um motivo desconhecido'}
+
 
 def get_graham(ticker, username):
 
@@ -354,7 +365,8 @@ def get_graham(ticker, username):
         string_de_retorno += ('\n''Fonte: OkaneBox')
         return string_de_retorno
 
-    if(dontHaveArguments(ticker)): return {'message': 'Você precisa informar o ticket da ação'}
+    if(dontHaveArguments(ticker)):
+        return {'message': 'Você precisa informar o ticket da ação'}
 
     ticker = ticker[0].upper()
     # send_menssage('/graham', 'user', ticker, username)
@@ -408,15 +420,17 @@ def get_graham(ticker, username):
     # send_menssage('/graham', 'agent', var_return['message'], username)
     return var_return
 
+
 def get_fii(ticker, username):
-    if(dontHaveArguments(ticker)): return {'message': 'Você precisa informar o ticket da ação'}
+    if(dontHaveArguments(ticker)):
+        return {'message': 'Você precisa informar o ticket da ação'}
 
     # Faz a requisição dos dados para a API
     ticker = ticker[0].upper()
     get_fii = requests.get(
-            'https://mfinance.com.br/api/v1/fiis/'+ticker, headers=default_headers)
+        'https://mfinance.com.br/api/v1/fiis/'+ticker, headers=default_headers)
     get_dividendos = requests.get(
-            'https://mfinance.com.br/api/v1/fiis/dividends/'+ticker, headers=default_headers)
+        'https://mfinance.com.br/api/v1/fiis/dividends/'+ticker, headers=default_headers)
 
     if get_fii.status_code == 200 and get_dividendos.status_code == 200:
         # Transforma em Json e possibilita tratar os dados
@@ -457,12 +471,12 @@ def get_fii(ticker, username):
 
             # Calcula o dividend yield
             dividend_yield = (soma_dividendos /
-                                get_fii['closingPrice'])*100
+                              get_fii['closingPrice'])*100
             round(dividend_yield, 2)  # Arredonda
 
             string_de_retorno = (f"O preço do FII {ticker} é: R$ {get_fii['closingPrice']} sendo a variação no dia de {get_fii['change']}%"
-                                    '\n'
-                                    f'Neste preço, o dividend yield (12m) é de {round(dividend_yield, 2)}% com uma distribuição de R$ {round(soma_dividendos, 2)}')
+                                 '\n'
+                                 f'Neste preço, o dividend yield (12m) é de {round(dividend_yield, 2)}% com uma distribuição de R$ {round(soma_dividendos, 2)}')
             return {'status': 200, 'message': string_de_retorno}
         else:
             """
@@ -474,18 +488,20 @@ def get_fii(ticker, username):
                     'status': 404, 'message': f'O fundo {ticker} não foi encontrado na API, tem certeza que digitou corretamente?'}
             elif get_fii['closingPrice'] != 0 and get_dividendos['dividends'] == None:
                 string_de_retorno = (f"O preço do FII {ticker} é: R$ {get_fii['closingPrice']} sendo a variação no dia de {get_fii['change']}%"
-                                        '\n'
-                                        'Ainda não foi encontrado um histórico de dividendos para este fundo, ele pode ser muito novo.')
+                                     '\n'
+                                     'Ainda não foi encontrado um histórico de dividendos para este fundo, ele pode ser muito novo.')
                 return {'status': 200, 'message': string_de_retorno}
             else:
                 return {'status': 500,
-                                'message': 'erro desconhecido'}
+                        'message': 'erro desconhecido'}
     else:
         return {
             'status': 503, 'message': f'A API mfinance está fora do ar por um motivo desconhecido, erro {get_fii.status_code}'}
 
+
 def get_cripto(ticker):
-    if(dontHaveArguments(ticker)): return {'message': 'Você precisa informar o ticket da criptomoeda'}
+    if(dontHaveArguments(ticker)):
+        return {'message': 'Você precisa informar o ticket da criptomoeda'}
 
     string_log = f"Comando /Coin {ticker} Acionado"
     logging.info(string_log)
@@ -501,24 +517,26 @@ def get_cripto(ticker):
             # float transforma a string em número de ponto flutuante
             # round arredonda para duas casas decimais
             return {'status': 200,
-                            'message': (f"O preço é R$ {pricecripto}"
-                                        "\n"
-                                        "Com dados do Coinlib.io")}
+                    'message': (f"O preço é R$ {pricecripto}"
+                                "\n"
+                                "Com dados do Coinlib.io")}
         else:
             return {'status': 200,
-                            'message': "API do Coinlib chegou ao máximo de solicitações, tente novamente mais tarde."}
+                    'message': "API do Coinlib chegou ao máximo de solicitações, tente novamente mais tarde."}
 
     else:
         return {'status': 503,
-                        'message': "Sistema temporariamente indisponível"}
+                'message': "Sistema temporariamente indisponível"}
+
 
 def cadastrar_fechamento(chat):
     result = database.addTelegramClient(chat)
-    
+
     if(result):
         return "Cadastrado com sucesso"
     else:
         return "Provavelmente você já está cadastrado"
+
 
 def descadastrar_fechamento(chat_id):
     result = database.removeTelegramClient(chat_id)
@@ -526,6 +544,7 @@ def descadastrar_fechamento(chat_id):
         return "Descadastrado com sucesso"
     else:
         return "Algum erro ocorreu"
+
 
 def get_all_clients():
     clients = database.getAllClients()
