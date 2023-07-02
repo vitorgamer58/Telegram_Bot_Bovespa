@@ -1,3 +1,7 @@
+⚠️ DEPRECIAÇÃO ⚠️
+
+Este projeto foi reescrito em Javascript e agora está sendo mantido no seguinte repositório: [https://github.com/vitorgamer58/telegram-bot-bovespa-herbs](https://github.com/vitorgamer58/telegram-bot-bovespa-herbs).
+
 # Telegram_Bot_Bovespa
 Este é o código Backend escrito em Python de um Bot do Telegram
 
@@ -31,11 +35,6 @@ A função principal do Bot é retornar a cotação de alguma ação listada na 
 | /fundamentus + código da ação | retorna indicadores fundamentalistas
 | /graham + código da ação | retorna o valor justo de acordo com a fórmula de Graham
 | /fechamento | retorna as maiores altas e baixas do ibovespa
-
-## Problemas e Bugs conhecidos
-O bot pode retornar um erro no console ao usar o comando /fechamento, sendo o erro envolvendo o arquivo bovespa_indice2.csv - isso se dá por um problema envolvendo diferentes sistemas operacionais, foi constatado que este erro acontece no Linux, porém não no Windows.
-
-Pode ser resolvido trazendo o arquivo bovespa_indice2.csv para dentro da pasta src e alterando o caminho na linha 30 do arquivo funcoes.py para 'bovespa_indice2.csv'
 
 
 ## Devidos créditos e direitos autorais de terceiros
